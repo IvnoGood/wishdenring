@@ -1,0 +1,19 @@
+Un jeu de donjon
+1ère personne 
+avec différentes salles avec dans chaque salle un boss a combattre
+en tout 5 salles
+chacune chaque thème
+salle 1: donjon trql + lave
+salle 2: thème cuisine
+thème 3: unkonow
+thème 4: unkonow
+thème 5: unkonow
+la salle finale c magnuss carlsen
+inventaire avec des armes poiur combattre les boss 
+chaque arme est loot sur les boss avec piuckup automatique ds l'inventaire
+qd il meurt une porte s'ouvre avec une salle suivante
+
+
+
+Signé
+Viktor AUrelien Afonso
