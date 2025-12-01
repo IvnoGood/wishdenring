@@ -14,6 +14,118 @@ import argparse
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
 
 
+class Inventory(Entity):
+    def __init__(self, width=8, height=5, **kwargs):
+        super().__init__(
+            parent=camera.ui,
+            model=Quad(radius=.015),
+            texture='white_cube',
+            texture_scale=(width, height),
+            scale=(width*.1, height*.1),
+            origin=(-.5, .5),
+            position=(-.3, .4),
+            color=color.hsv(0, 0, .1, .9),
+        )
+
+        self.width = width
+        self.height = height
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def find_free_spot(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                grid_positions = [(int(e.x*self.texture_scale[0]),
+                                   int(e.y*self.texture_scale[1])) for e in self.children]
+                print(grid_positions)
+
+                if not (x, -y) in grid_positions:
+                    print('found free spot:', x, y)
+                    return x, y
+
+    def append(self, item, x=0, y=0):
+        print('add item:', item)
+
+        if len(self.children) >= self.width*self.height:
+            print('inventory full')
+            error_message = Text('<red>Inventory is full!',
+                                 origin=(0, -1.5), x=-.5, scale=2)
+            destroy(error_message, delay=1)
+            return
+
+        x, y = self.find_free_spot()
+
+        icon = Draggable(
+            parent=self,
+            model='quad',
+            texture=item,
+            color=color.white,
+            scale_x=1/self.texture_scale[0],
+            scale_y=1/self.texture_scale[1],
+            origin=(-.5, .5),
+            x=x * 1/self.texture_scale[0],
+            y=-y * 1/self.texture_scale[1],
+            z=-1,
+        )
+        name = item.replace('_', ' ').title()
+
+        if random.random() < .25:
+            icon.color = color.gold
+            name = '<orange>Rare ' + name
+
+        icon.tooltip = Tooltip(name)
+        icon.tooltip.background_entity.color = color.hsv(0, 0, 0, .8)
+
+        def drag():
+            icon.org_pos = (icon.x, icon.y)
+            icon.z = -2   # ensure the dragged item overlaps the rest
+
+        def drop():
+            icon.x = int((icon.x + (icon.scale_x/2)) * self.width) / self.width
+            icon.y = int((icon.y - (icon.scale_y/2))
+                         * self.height) / self.height
+            icon.z = -1
+
+            # if outside, return to original position
+            if icon.x < 0 or icon.x >= 1 or icon.y > 0 or icon.y <= -1:
+                icon.position = (icon.org_pos)
+                return
+
+            # if the spot is taken, swap positions
+            for c in self.children:
+                if c == icon:
+                    continue
+
+                if c.x == icon.x and c.y == icon.y:
+                    print('swap positions')
+                    c.position = icon.org_pos
+
+        icon.drag = drag
+        icon.drop = drop
+
+
+def add_item():
+    inventory.append(random.choice(
+        ('bag', 'bow_arrow', 'gem', 'orb', 'sword')))
+
+
+""" add_item_button = Button(
+    scale=(.1, .1),
+    x=-.5,
+    color=color.lime.tint(-.25),
+    text='+',
+    tooltip=Tooltip('Add random item'),
+    on_click=add_item
+) """
+
+inventory = Inventory()
+isInv = False
+
+for i in range(0, 10):
+    add_item()
+
+
 class Character(Entity):
     def __init__(self):
         super().__init__(
@@ -59,7 +171,50 @@ class Players(Entity):
         )
 
 
+class BottomBar(Entity):
+    def __init__(self):
+        player.enabled = False
+        super().__init__(
+            parent=camera.ui,
+
+        )
+
+        self.iventory = Entity(parent=self,
+                               model='quad',
+                               scale=(0.65, 0.08),
+                               origin=(0, 0),
+                               position=(0, -0.4),
+                               texture='white_cube',
+                               texture_scale=(8, 1),
+                               enable=True,
+                               color=color.hsv(0, 0, .1, .9),
+                               )
+        self.width = width
+        self.height = height
+        self.selected = Entity(parent=self,
+                               model='quad',
+                               scale=(0.08, 0.08),
+                               origin=(0, 0),
+                               position=(0, -0.4),  # slot 1
+                               texture='white_cube',
+                               texture_scale=(1, 1),
+                               enable=True,
+                               color=color.white,
+                               )
+
+        self.health = Entity(parent=self,
+                             model='quad',
+                             scale=(0.32, 0.04),  # full = 0.32 50%: 16
+                             origin=(0, 0),
+                             position=(-0.6, -0.4),
+                             color=color.green,
+                             texture_scale=(8, 1),
+                             enable=True
+                             )
+
+
 player = Character()
+inv = BottomBar()
 
 checkpoints = {
     0: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(0, 0.5, 0), collider='box'),
@@ -174,6 +329,7 @@ def update():
     global connected_users
     global other_users
     global connected_user_entities
+    global isInv
 
     camera.parent = player
     camera.position = Vec3(0, 3, 0)
@@ -183,7 +339,7 @@ def update():
             last_checkpoint = checkpoints[i]
             checkpoints[i].color = color.yellow
 
-    if held_keys['left mouse']:
+    if held_keys['right mouse']:
 
         camera.rotation_x -= mouse.delta[1] * sensitivity
         camera.rotation_y += mouse.delta[0] * sensitivity
@@ -251,6 +407,17 @@ def update():
     if pause == False:
         mouse.locked = True
         mouse.visible = False
+
+    if held_keys['h']:
+        if isInv:
+            isInv = False
+        else:
+            isInv = True
+
+    if held_keys['j']:
+        inventory.enabled = False
+
+    inventory.enabled = isInv
 
     user_data[str(random_uuid)]['player']['location'] = tuple(player.position)
     user_data[str(random_uuid)]['player']['rotation'] = [
