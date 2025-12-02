@@ -1,7 +1,7 @@
 
 from ursina import *
 from random import randint
-import requests
+#import requests
 import json
 import uuid
 import websockets
@@ -135,6 +135,53 @@ class Character(Entity):
             collider='box'
         )
 
+""" class Sword(Entity):
+    def __init__(self):
+        super().__init__(
+            model='cube',
+            color=color.red,
+            position=(0, 0, 0),
+            collider='box',
+            rotation=(0,45,45),
+            parent=camera.ui
+        ) 
+
+sword = Sword()
+
+class Boss(Entity):
+    def __init__(self, position=(0, 10, 0), rotation=(0, 0, 0), **kwargs):
+        # Initialize the parent entity at the networked position/rotation
+        # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
+        super().__init__(position=Vec3(*position), **kwargs)
+
+        # Create children using local coordinates and parent=self so moving this Entity moves them all
+        self.sphere = Entity(
+            parent=self,
+            model='sphere',
+            color=color.black,
+            position=Vec3(0, 0, 0),
+            collider='box',
+            scale=1
+        )
+
+        self.torso = Entity(
+            parent=self,
+            model='cube',
+            color=color.black,
+            position=Vec3(0, 1.5, 0),
+            scale=Vec3(1, 2, 1),
+            collider='box'
+        )
+
+        self.head = Entity(
+            parent=self,
+            model='cube',
+            color=color.black,
+            position=Vec3(0, 3.25, 0),
+            scale=Vec3(1, 1, 1),
+            collider='box',
+        )
+ """
 
 class Players(Entity):
     def __init__(self, position=(0, 10, 0), rotation=(0, 0, 0), **kwargs):
@@ -189,8 +236,8 @@ class BottomBar(Entity):
                                enable=True,
                                color=color.hsv(0, 0, .1, .9),
                                )
-        self.width = width
-        self.height = height
+        #width = self.width
+        #height = self.height
         self.selected = Entity(parent=self,
                                model='quad',
                                scale=(0.08, 0.08),
