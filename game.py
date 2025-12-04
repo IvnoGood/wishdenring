@@ -32,8 +32,10 @@ structure_grotte = {
 tp_grotte= {
         0:Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10,10))
 }
-
-
+camera.clip_plane_far = 100
+boss_room={
+    1:Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png',collider='box', position=(500,-1,500), texture_scale=(60, 60))
+    }
 
 class Character(Entity):
     def __init__(self):
@@ -125,7 +127,40 @@ class Players(Entity):
             scale=Vec3(1, 1, 1),
             collider='box',
         )
+class Enemies(Entity):
+    def __init__(self, position=(10, 10, 10), rotation=(0, 0, 0), **kwargs):
+        # Initialize the parent entity at the networked position/rotation
+        # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
+        super().__init__(position=Vec3(*position), **kwargs)
 
+        # Create children using local coordinates and parent=self so moving this Entity moves them all
+        self.sphere = Entity(
+            parent=self,
+            model='sphere',
+            color=color.blue,
+            position=Vec3(0, 0, 0),
+            collider='box',
+            scale=1
+        )
+
+        self.torso = Entity(
+            parent=self,
+            model='cube',
+            color=color.blue,
+            position=Vec3(0, 1.25, 0),
+            scale=Vec3(1, 2, 1),
+            collider='box'
+        )
+
+        self.head = Entity(
+            parent=self,
+            model='cube',
+            texture='shrek_face.jpg',
+            position=Vec3(0, 2.75, 0),
+            scale=Vec3(1, 1, 1),
+            collider='box',
+        )
+enemy=Enemies()
 
 class BottomBar(Entity):
     def __init__(self):
@@ -138,7 +173,7 @@ class BottomBar(Entity):
         self.iventory = Entity(parent=self,
                                model='quad',
                                scale=(0.65, 0.08),
-                               origin=(0, 0),
+                               origin=(3, 3),
                                position=(0, -0.4),
                                texture='white_cube',
                                texture_scale=(8, 1),
@@ -150,7 +185,7 @@ class BottomBar(Entity):
         self.selected = Entity(parent=self,
                                model='quad',
                                scale=(0.08, 0.08),
-                               origin=(0, 0),
+                               origin=(3, 3),
                                position=(0, -0.4),  # slot 1
                                texture='white_cube',
                                texture_scale=(1, 1),
@@ -161,7 +196,7 @@ class BottomBar(Entity):
         self.health = Entity(parent=self,
                              model='quad',
                              scale=(0.32, 0.04),  # full = 0.32 50%: 16
-                             origin=(0, 0),
+                             origin=(3, 3),
                              position=(-0.6, -0.4),
                              color=color.green,
                              texture_scale=(8, 1),
@@ -188,7 +223,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 
 
-sol = Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png',
+sol = Entity(model='plane', scale=200, texture='./assets/textures/concrete_0.png',
              collider='box', origin_y=0, texture_scale=(60, 60))
 
 
@@ -281,37 +316,38 @@ def placeOtherPlayers():
 
 
 
-grid = {(x, z): True for x in range(-100,100) for z in range(-100,100)}
+grid = {(x, z): True for x in range(-50,50) for z in range(-50,50)}
 
-#  BFS Pathfinding 
-def bfs(start, goal):
-    queue = deque([start])
-    came_from = {start: None}
+#  BFS Pathfinding
+if player.x in range(-50,50) and player.z in range(-50,50):
+    def bfs(start, goal):
+        queue = deque([start])
+        came_from = {start: None}
 
-    while queue:
-        current = queue.popleft()
+        while queue:
+            current = queue.popleft()
 
-        if current == goal:
-            break
+            if current == goal:
+                break
 
-        x, z = current
-        neighbors = [(x+1,z), (x-1,z), (x,z+1), (x,z-1)]
+            x, z = current
+            neighbors = [(x+1,z), (x-1,z), (x,z+1), (x,z-1)]
 
-        for n in neighbors:
-            if n in grid and grid[n] and n not in came_from:
-                queue.append(n)
-                came_from[n] = current
+            for n in neighbors:
+                if n in grid and grid[n] and n not in came_from:
+                    queue.append(n)
+                    came_from[n] = current
 
-    # Reconstitution du chemin
-    path = []
-    c = goal
-    while c != start:
-        path.append(c)
-        c = came_from.get(c)
-        if c is None:   # Pas de chemin
-            return []
-    path.reverse()
-    return path
+        # Reconstitution du chemin
+        path = []
+        c = goal
+        while c != start:
+            path.append(c)
+            c = came_from.get(c)
+            if c is None:   # Pas de chemin
+                return []
+        path.reverse()
+        return path
 
 
 path = []
@@ -322,7 +358,6 @@ def set_moving_false():
     global moving
     moving = False
 
-enemy  = Entity(model='cube', color=color.red,   position=(10,10,0),collider='box' )
 
 
 camera.fov = 90
@@ -367,6 +402,9 @@ def update():
     if pause == False:
         if held_keys['w']:
             move += direction * vitesse
+            if held_keys['shift']:
+                move += direction * vitesse
+
         if held_keys['s']:
             move -= direction * vitesse
         if held_keys['a']:
@@ -431,7 +469,7 @@ def update():
         placeOtherPlayers()
     
     if held_keys['escape'] or held_keys['e']:
-        sleep(0.35)
+        sleep(0.25)
         pause = not pause   # ON <-> OFF
 
         if pause:
@@ -444,13 +482,12 @@ def update():
     for i in tp_grotte:
         if distance(player.position, tp_grotte[i].position)<= 2.5:
             print("tp")
-            player.position=(10000,10000,10000)
+            player.position=(500,0,500)
     
-        
     enemy_pos = (round(enemy.x), round(enemy.z))
     player_pos = (round(player.x), round(player.z))
     if pause != True:
-        if distance(enemy.position, player.position) <= 2.5:
+        if distance(enemy.position, player.position) <= 4.5:
             path = []
             return
         # Recalcul du chemin si aucune étape restante et si l'ennemi ne bouge pas
@@ -467,7 +504,7 @@ def update():
 
             # Lancer l'animation vers la prochaine case
             moving = True
-            duration = 0.35
+            duration = 0.2
             enemy.animate_position(
                 Vec3(next_step[0], 0, next_step[1]),
                 duration=duration,
@@ -476,6 +513,5 @@ def update():
 
             # Quand l'animation finit, on met moving = False
             invoke(set_moving_false, delay=duration)
-   
 
 app.run()
