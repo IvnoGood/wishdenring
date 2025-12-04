@@ -32,9 +32,9 @@ structure_grotte = {
 tp_grotte= {
         0:Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10,10))
 }
-camera.clip_plane_far = 100
+camera.clip_plane_far = 75
 boss_room={
-    1:Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png',collider='box', position=(500,-1,500), texture_scale=(60, 60))
+    1:Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png',collider='box', position=(500,-0.5,500), texture_scale=(60, 60))
     }
 
 class Character(Entity):
@@ -128,7 +128,7 @@ class Players(Entity):
             collider='box',
         )
 class Enemies(Entity):
-    def __init__(self, position=(10, 10, 10), rotation=(0, 0, 0), **kwargs):
+    def __init__(self, position=(520, 10, 500), rotation=(0, 0, 0), **kwargs):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
         super().__init__(position=Vec3(*position), **kwargs)
@@ -139,7 +139,7 @@ class Enemies(Entity):
             model='sphere',
             color=color.blue,
             position=Vec3(0, 0, 0),
-            collider='box',
+            collider='mesh',
             scale=1
         )
 
@@ -149,7 +149,7 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 1.25, 0),
             scale=Vec3(1, 2, 1),
-            collider='box'
+            collider='mesh'
         )
 
         self.head = Entity(
@@ -158,7 +158,7 @@ class Enemies(Entity):
             texture='shrek_face.jpg',
             position=Vec3(0, 2.75, 0),
             scale=Vec3(1, 1, 1),
-            collider='box',
+            collider='mesh',
         )
 enemy=Enemies()
 
@@ -224,12 +224,12 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 
 sol = Entity(model='plane', scale=200, texture='./assets/textures/concrete_0.png',
-             collider='box', origin_y=0, texture_scale=(60, 60))
+             collider='box', origin_y=0, texture_scale=(200, 200))
 
 
 player.rotation_y = 180
 vitesse_chute = 0
-force_gravite = -1
+force_gravite = -1.5
 last_checkpoint = player.position
 
 player.mouse_sensitivity = Vec2(40, 40)
@@ -316,38 +316,37 @@ def placeOtherPlayers():
 
 
 
-grid = {(x, z): True for x in range(-50,50) for z in range(-50,50)}
+grid = {(x, z): True for x in range(450,550) for z in range(450,550)}
 
 #  BFS Pathfinding
-if player.x in range(-50,50) and player.z in range(-50,50):
-    def bfs(start, goal):
-        queue = deque([start])
-        came_from = {start: None}
+def bfs(start, goal):
+    queue = deque([start])
+    came_from = {start: None}
 
-        while queue:
-            current = queue.popleft()
+    while queue:
+        current = queue.popleft()
 
-            if current == goal:
-                break
+        if current == goal:
+            break
 
-            x, z = current
-            neighbors = [(x+1,z), (x-1,z), (x,z+1), (x,z-1)]
+        x, z = current
+        neighbors = [(x+1,z), (x-1,z), (x,z+1), (x,z-1)]
 
-            for n in neighbors:
-                if n in grid and grid[n] and n not in came_from:
-                    queue.append(n)
-                    came_from[n] = current
+        for n in neighbors:
+            if n in grid and grid[n] and n not in came_from:
+                queue.append(n)
+                came_from[n] = current
 
         # Reconstitution du chemin
-        path = []
-        c = goal
-        while c != start:
-            path.append(c)
-            c = came_from.get(c)
-            if c is None:   # Pas de chemin
-                return []
-        path.reverse()
-        return path
+    path = []
+    c = goal
+    while c != start:
+        path.append(c)
+        c = came_from.get(c)
+        if c is None:   # Pas de chemin
+            return []
+    path.reverse()
+    return path
 
 
 path = []
@@ -358,15 +357,22 @@ def set_moving_false():
     global moving
     moving = False
 
-
-
+msg = Text(
+    text='BOSS ROOM',
+    font='assets/textures/font_boss.ttf',
+    scale=8,
+    color=color.red,
+    origin=(0,-1.4)
+)
+msg.disable()
 camera.fov = 90
 camera.parent = player.camera_pivot   # <- essentiel pour FPS
 camera.position = Vec3(0, 0, 0)
 pause = False
-
-Sky()
-
+sky = Sky(color=color.white)
+boss_battle = False
+if boss_battle == False:
+    sky.color=color.white
 def update():
     vitesse = 4 * time.dt
     global vitesse_chute
@@ -481,8 +487,12 @@ def update():
     
     for i in tp_grotte:
         if distance(player.position, tp_grotte[i].position)<= 2.5:
-            print("tp")
-            player.position=(500,0,500)
+            print("Début combat de boss")
+            msg.enable()
+            invoke(lambda: msg.animate('alpha', 0, duration=1), delay=2)
+            boss_battle=True
+            sky.color=color.red
+            player.position=(500,2,500)
     
     enemy_pos = (round(enemy.x), round(enemy.z))
     player_pos = (round(player.x), round(player.z))
