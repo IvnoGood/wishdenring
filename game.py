@@ -10,12 +10,76 @@ import asyncio
 from time import sleep
 import argparse
 from collections import deque
+from perlin_noise import PerlinNoise
+from time import time as tm
+from ursina.shaders import ssao_shader
 
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
 
+# ------ STRUCTURES ------
 
+hut = Entity(model="./assets/models/hut.obj",
+             scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
+
+ThoamsNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
+                                                           1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
+ThomasNpcTag = Entity(model="plane", rotation=(
+    270, 0, 0), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
+
+# ------ STRUCTURES END ------
+
+
+# ------ NATURES ------
+
+# Flowers
+for i in range(25):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    flower1 = Entity(
+        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, 45, 0), double_sided=True)
+    flower2 = Entity(
+        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
+
+for i in range(150):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    type = randint(1, 3)
+    flower1 = Entity(
+        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, 45, 0), double_sided=True)
+    flower2 = Entity(
+        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, -45, 0), double_sided=True)
+
+""" # small grass
+for i in range(50):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    flower1 = Entity(
+        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower2 = Entity(
+        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, -45, 0), double_sided=True, color=color.green)
+
+# tall grass
+for i in range(50):
+    max = 200
+    posBottom = (randint(-max, max), 0.5, randint(-max, max))
+    posTop = (posBottom[0], posBottom[1]+1, posBottom[2])
+    flower1Bottom = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower1Top = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower2Bottom = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, -45, 0), double_sided=True, color=color.green)
+    flower2Top = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, -45, 0), double_sided=True, color=color.green)
+ """
+
+# ------ NATURES END ------
+
+
+# ------ CLOUDS ------
+clouds = []
 for i in range(9):
-    Entity(
+    cloud = Entity(
         model='cube',
         scale=(randint(8, 14), randint(2, 5), randint(8, 14)),
         color=color.white33,
@@ -23,6 +87,20 @@ for i in range(9):
         rotation=(0, randint(0, 360), 0),
         alpha=0.8
     )
+    clouds.append(cloud)
+
+
+def moveClouds():
+    for cloud in clouds:
+        cloud.x += 1 * time.dt
+
+# ------ CLOUDS END ------
+
+
+class Character(Entity):
+    def __init__(self, position=(0, 0.5, 0)):
+        self.block = Entity()
+
 
 structure_grotte = {
     0: Entity(model='cube', scale=(5, 5, 5), position=(10, 2, 20), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
@@ -44,7 +122,7 @@ class Character(Entity):
             model='sphere',
             color=color.red,
             position=(0, 3, 0),
-            collider='box'
+            collider='sphere'
         )
 
 
@@ -141,7 +219,6 @@ class BottomBar(Entity):
         player.enabled = True
         super().__init__(
             parent=camera.ui,
-
         )
 
         self.iventory = Entity(parent=self,
@@ -183,9 +260,52 @@ platforme = Entity(model='cube', color=color.orange, scale=(
     1, 1, 1), position=(-1, -2, -7), collider='box')
 
 
-sol = Entity(model='plane', scale=200, texture='./assets/textures/concrete_0.png',
+# ------ TERRAIN ------
+sol = Entity(model='plane', scale=200, texture='grass',
              collider='box', origin_y=0, texture_scale=(200, 200))
 
+""" noise = PerlinNoise(octaves=3, seed=0)
+amp = 2
+freq = 24
+width = 30
+
+
+# Source - https://stackoverflow.com/questions/70467860/need-help-in-perline-noise-ursina-to-make-an-a-plain-land
+# Posted by Jan Wilamowski
+# Retrieved 2025-12-06, License - CC BY-SA 4.0
+start = tm()
+sol = Entity(model=Mesh(vertices=[], uvs=[]),
+             color=color.white, texture='./assets/textures/grass.png', texture_scale=(1, 1))
+
+for x in range(1, width):
+    for z in range(1, width):
+        # add two triangles for each new point
+        y00 = noise([x/freq, z/freq]) * amp
+        y10 = noise([(x-1)/freq, z/freq]) * amp
+        y11 = noise([(x-1)/freq, (z-1)/freq]) * amp
+        y01 = noise([x/freq, (z-1)/freq]) * amp
+        sol.model.vertices += (
+            # first triangle
+            (x, y00, z),
+            (x-1, y10, z),
+            (x-1, y11, z-1),
+            # second triangle
+            (x, y00, z),
+            (x-1, y11, z-1),
+            (x, y01, z-1)
+        )
+
+sol.model.generate()
+sol.model.project_uvs()  # for texture
+sol.model.generate_normals()  # for lighting
+sol.collider = 'mesh'  # for collision
+
+end = tm()
+
+print("took", end-start, "seconds to generate terrain")
+
+ """
+# ------ END TERRAIN ------
 
 player.rotation_y = 180
 vitesse_chute = 0
@@ -194,11 +314,15 @@ last_checkpoint = player.position
 
 player.mouse_sensitivity = Vec2(40, 40)
 player.camera_pivot = Entity(parent=player, y=player.height)
-
+# camera.shader = ssao_shader  # ! c'est juste moche
 mouse.locked = True
 
 pause = False
 footstepsIsPlaying = False
+bgmusicIsPlaying = False
+
+
+# ------ MULTIPLAYER ------
 
 random_uuid = uuid.uuid4()
 uri = "ws://localhost:8080"
@@ -273,6 +397,8 @@ def placeOtherPlayers():
                 print(connected_user_entities)
             pass
 
+# ------ MULTIPLAYER END ------
+
 
 grid = {(x, z): True for x in range(450, 550) for z in range(450, 550)}
 
@@ -332,10 +458,13 @@ camera.fov = 90
 camera.parent = player.camera_pivot   # <- essentiel pour FPS
 camera.position = Vec3(0, 0, 0)
 pause = False
-sky = Sky(color=color.white)
+sky_image = load_texture("./assets/textures/environement/sunset.jpg")
+sky = Sky(color=color.white, texture=sky_image)
 boss_battle = False
 if boss_battle == False:
     sky.color = color.white
+
+environementSounds = None
 
 
 def update():
@@ -344,13 +473,25 @@ def update():
     global last_checkpoint
     global sensitivity
     global pause
-    global footstepsIsPlaying
+    global bgmusicIsPlaying
+    global environementSounds
     global counter
     global connected_users
     global other_users
     global connected_user_entities
     global isInv
     global path, moving
+    global boss_battle
+
+    # ------ AUDIO environement ------
+    if (not bgmusicIsPlaying):
+        print("Loading sound...")
+        environementSounds = Audio('./assets/sounds/env_1.mp3',
+                                   loop=True, autoplay=True)
+        environementSounds.volume = 5
+        print("Loaded:", environementSounds)
+        bgmusicIsPlaying = True
+    # ------ END AUDIO environement ------
 
     for i in checkpoints:
         if distance(player.position, checkpoints[i].position) <= 1.5:
@@ -422,6 +563,8 @@ def update():
     if player.y <= -5:
         player.position = (last_checkpoint.x,
                            last_checkpoint.y + 2, last_checkpoint.z)
+        boss_battle = False
+        sky.color = color.white
 
     user_data[str(random_uuid)]['player']['location'] = tuple(player.position)
     user_data[str(random_uuid)]['player']['rotation'] = [
@@ -488,6 +631,10 @@ def update():
 
             # Quand l'animation finit, on met moving = False
             invoke(set_moving_false, delay=duration)
+
+        moveClouds()
+
+        ThomasNpcTag.look_at(player, axis=Vec3.up)
 
 
 app.run()
