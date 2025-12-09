@@ -634,7 +634,7 @@ def update():
 
         moveClouds()
 
-        #ThomasNpcTag.look_at(player.position)
+        # ThomasNpcTag.look_at(player.position)
 
 
 app.run()
