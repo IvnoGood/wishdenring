@@ -73,7 +73,7 @@ for i in range(50):
         model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, -45, 0), double_sided=True, color=color.green)
  """
 
-# ------ NATURES END ------
+# ------ NATURES END ----from perlin_noise import PerlinNoise--
 
 
 # ------ CLOUDS ------
@@ -261,7 +261,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 
 # ------ TERRAIN ------
-sol = Entity(model='plane', scale=200, texture='grass',
+sol = Entity(model='plane', scale=264, texture='grass',
              collider='box', origin_y=0, texture_scale=(200, 200))
 
 """ noise = PerlinNoise(octaves=3, seed=0)
@@ -634,7 +634,7 @@ def update():
 
         moveClouds()
 
-        ThomasNpcTag.look_at(player, axis=Vec3.up)
+        #ThomasNpcTag.look_at(player.position)
 
 
 app.run()
