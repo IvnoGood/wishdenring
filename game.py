@@ -16,86 +16,6 @@ from ursina.shaders import ssao_shader
 
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
 
-# ------ STRUCTURES ------
-
-hut = Entity(model="./assets/models/hut.obj",
-             scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
-
-ThoamsNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
-                                                           1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
-ThomasNpcTag = Entity(model="plane", rotation=(
-    270, 0, 0), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
-
-# ------ STRUCTURES END ------
-
-
-# ------ NATURES ------
-
-# Flowers
-for i in range(25):
-    max = 200
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    flower1 = Entity(
-        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, 45, 0), double_sided=True)
-    flower2 = Entity(
-        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
-
-for i in range(150):
-    max = 200
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    type = randint(1, 3)
-    flower1 = Entity(
-        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, 45, 0), double_sided=True)
-    flower2 = Entity(
-        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, -45, 0), double_sided=True)
-
-""" # small grass
-for i in range(50):
-    max = 200
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    flower1 = Entity(
-        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower2 = Entity(
-        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, -45, 0), double_sided=True, color=color.green)
-
-# tall grass
-for i in range(50):
-    max = 200
-    posBottom = (randint(-max, max), 0.5, randint(-max, max))
-    posTop = (posBottom[0], posBottom[1]+1, posBottom[2])
-    flower1Bottom = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower1Top = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower2Bottom = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, -45, 0), double_sided=True, color=color.green)
-    flower2Top = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, -45, 0), double_sided=True, color=color.green)
- """
-
-# ------ NATURES END ----from perlin_noise import PerlinNoise--
-
-
-# ------ CLOUDS ------
-clouds = []
-for i in range(9):
-    cloud = Entity(
-        model='cube',
-        scale=(randint(8, 14), randint(2, 5), randint(8, 14)),
-        color=color.white33,
-        position=(randint(-100, 100), randint(20, 30), randint(-100, 100)),
-        rotation=(0, randint(0, 360), 0),
-        alpha=0.8
-    )
-    clouds.append(cloud)
-
-
-def moveClouds():
-    for cloud in clouds:
-        cloud.x += 1 * time.dt
-
-# ------ CLOUDS END ------
-
 
 class Character(Entity):
     def __init__(self, position=(0, 0.5, 0)):
@@ -316,7 +236,6 @@ player.mouse_sensitivity = Vec2(40, 40)
 player.camera_pivot = Entity(parent=player, y=player.height)
 # camera.shader = ssao_shader  # ! c'est juste moche
 mouse.locked = True
-
 pause = False
 footstepsIsPlaying = False
 bgmusicIsPlaying = False
@@ -465,6 +384,138 @@ if boss_battle == False:
     sky.color = color.white
 
 environementSounds = None
+
+
+# ------ STRUCTURES ------
+
+hut = Entity(model="./assets/models/hut.obj",
+             scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
+
+ThoamsNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
+                                                           1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
+ThomasNpcTag = Entity(model="plane", rotation=(
+    270, 0, 0), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
+
+NpcToolTip = Text("Appuie sur T pour discuter")
+NpcToolTip.disable()
+
+
+""" class ThomasGUI(Entity):
+    def __init__(self):
+        super().__init__(
+            parent=camera.ui
+        )
+        self.gui = Entity(
+            parent=self,
+            model='quad',
+            scale=(1.5, 0.85),
+            origin=(0, -0.09),
+            position=(0, 0),
+            texture='./assets/textures/guiThomas.png',
+            enable=True)
+         """
+
+NpcThomasGUI = WindowPanel(
+    title='Thomas - Forgeron',
+    content=(
+        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+    ),
+    popup=False,
+    Draggable=False
+)
+NpcThomasGUI.y = NpcThomasGUI.panel.scale_y / 2 * NpcThomasGUI.scale_y
+NpcThomasGUI.layout()
+NpcThomasGUI.disable()
+
+
+def displayForNpc(pause):
+    if (distance(player, ThoamsNpc) < 3):
+        NpcToolTip.enable()
+        if (held_keys["t"]):
+            print("opened gui")
+            NpcToolTip.disable()
+            time.sleep(0.25)
+            pause = True
+            NpcThomasGUI.enable()
+            return pause
+    else:
+        NpcToolTip.disable()
+        NpcThomasGUI.disable()
+        return pause
+
+# ------ STRUCTURES END ------
+
+
+# ------ NATURES ------
+
+# Flowers
+for i in range(25):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    flower1 = Entity(
+        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, 45, 0), double_sided=True)
+    flower2 = Entity(
+        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
+
+for i in range(150):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    type = randint(1, 3)
+    flower1 = Entity(
+        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, 45, 0), double_sided=True)
+    flower2 = Entity(
+        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, -45, 0), double_sided=True)
+
+""" # small grass
+for i in range(50):
+    max = 200
+    pos = (randint(-max, max), 0.5, randint(-max, max))
+    flower1 = Entity(
+        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower2 = Entity(
+        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, -45, 0), double_sided=True, color=color.green)
+
+# tall grass
+for i in range(50):
+    max = 200
+    posBottom = (randint(-max, max), 0.5, randint(-max, max))
+    posTop = (posBottom[0], posBottom[1]+1, posBottom[2])
+    flower1Bottom = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower1Top = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, 45, 0), double_sided=True, color=color.green)
+    flower2Bottom = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, -45, 0), double_sided=True, color=color.green)
+    flower2Top = Entity(
+        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, -45, 0), double_sided=True, color=color.green)
+ """
+
+# ------ NATURES END ----from perlin_noise import PerlinNoise--
+
+
+# ------ CLOUDS ------
+clouds = []
+for i in range(9):
+    cloud = Entity(
+        model='cube',
+        scale=(randint(8, 14), randint(2, 5), randint(8, 14)),
+        color=color.white33,
+        position=(randint(-100, 100), randint(20, 30), randint(-100, 100)),
+        rotation=(0, randint(0, 360), 0),
+        alpha=0.8
+    )
+    clouds.append(cloud)
+
+
+def moveClouds():
+    for cloud in clouds:
+        cloud.x += 1 * time.dt
+
+# ------ CLOUDS END ------
 
 
 def update():
@@ -633,7 +684,7 @@ def update():
             invoke(set_moving_false, delay=duration)
 
         moveClouds()
-
+        pause = displayForNpc(pause)
         # ThomasNpcTag.look_at(player.position)
 
 
