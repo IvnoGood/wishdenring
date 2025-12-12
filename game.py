@@ -136,7 +136,6 @@ enemy = Enemies()
 
 class BottomBar(Entity):
     def __init__(self):
-        player.enabled = True
         super().__init__(
             parent=camera.ui,
         )
@@ -160,6 +159,31 @@ class BottomBar(Entity):
                              texture_scale=(8, 1),
                              enable=True
                              )
+
+class MoneyDisplay(Text):
+    def __init__(self, value="123"):
+        super().__init__(
+            parent = camera.ui,
+            text=value,
+            origin=(0, 0),
+            position=(0.6, -0.4),
+            font='assets/fonts/BitcountPropSingle-Regular.ttf',
+            scale=2,
+            color=color.gold
+        )
+
+        self.coinme = Entity(parent=self,
+                               model='quad',
+                               scale=(0.05, 0.05),
+                               origin=(0, 0),
+                               position=(-0.05, 0),
+                               texture='./assets/textures/coin.png',
+                               enable=True
+                               )
+
+    def update_value(self, new_value):
+        self.text = str(new_value)
+
 
 
 player = Character()
@@ -384,7 +408,7 @@ if boss_battle == False:
     sky.color = color.white
 
 environementSounds = None
-
+coins = 200
 
 # ------ STRUCTURES ------
 
@@ -414,15 +438,26 @@ NpcToolTip.disable()
             texture='./assets/textures/guiThomas.png',
             enable=True)
          """
+class ShopButton(Button):
+    def __init__(self,title="Lorem Ipsum", defcolor=color.azure, cost=0,usercoins=100,**kwargs):
+        super().__init__(text=title, color=defcolor)
+        def takemymoney():
+             moneyDp.update_value(str(usercoins - cost))
+
+        self.on_click = takemymoney
+
+class GUIExitBtn(Button):
+    def __init__(self,gui=[], **kwargs):
+        super().__init__(text="Exit", color=color.red)
+        #self.on_click = gui.disable()
+
 
 NpcThomasGUI = WindowPanel(
     title='Thomas - Forgeron',
     content=(
-        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
-        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
-        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
-        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
-        Button(text='Achète Lorem sword pour 5 pièces', color=color.azure),
+        ShopButton(title="fdf", cost=32, usercoins=coins),
+        ShopButton(title="caca"),
+        GUIExitBtn()
     ),
     popup=False,
     Draggable=False
@@ -439,9 +474,10 @@ def displayForNpc(pause):
             print("opened gui")
             NpcToolTip.disable()
             time.sleep(0.25)
+            mouse.locked = False
             pause = True
             NpcThomasGUI.enable()
-            return pause
+        return pause
     else:
         NpcToolTip.disable()
         NpcThomasGUI.disable()
@@ -517,6 +553,7 @@ def moveClouds():
 
 # ------ CLOUDS END ------
 
+moneyDp = MoneyDisplay(value=str(coins))
 
 def update():
     vitesse = 4 * time.dt
@@ -533,6 +570,10 @@ def update():
     global isInv
     global path, moving
     global boss_battle
+    global coins
+
+    #moneyDp.update_value("1000")
+    
 
     # ------ AUDIO environement ------
     if (not bgmusicIsPlaying):
