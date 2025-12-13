@@ -2,12 +2,21 @@ from ursina import *
 
 from ursina.prefabs.first_person_controller import *
 
+items = []
+
 
 def update():
-    entité1.rotation_y += 50 * time.dt
-    if distance(player, entité1) < 4:
-        inventaire[1] = "entité1"
-        print(inventaire)
+
+    for entity in items:
+        if distance(player, entity) < 4:
+            inventaire[1] = entity
+            print(inventaire)
+            destroy(entity)
+            items.clear
+            break
+        else:
+            entity.rotation_y += 50 * time.dt
+
     direction_x = player.x - ennemi.x
     direction_z = player.z - ennemi.z
     direction = Vec3(direction_x, 0, direction_z)
@@ -61,6 +70,8 @@ entité1 = Entity(model='cube',
                  rotation=(0, 0, 0),
                  position=(10, 0, 0),
                  scale=(1, 1, 1))
+items.append(entité1)
+
 player = FirstPersonController(position=(0, 0, 0), scale=(1, 4, 1))
 
 item = Entity(parent=player,

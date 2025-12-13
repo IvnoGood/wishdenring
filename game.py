@@ -160,10 +160,11 @@ class BottomBar(Entity):
                              enable=True
                              )
 
+
 class MoneyDisplay(Text):
     def __init__(self, value="123"):
         super().__init__(
-            parent = camera.ui,
+            parent=camera.ui,
             text=value,
             origin=(0, 0),
             position=(0.6, -0.4),
@@ -173,17 +174,16 @@ class MoneyDisplay(Text):
         )
 
         self.coinme = Entity(parent=self,
-                               model='quad',
-                               scale=(0.05, 0.05),
-                               origin=(0, 0),
-                               position=(-0.05, 0),
-                               texture='./assets/textures/coin.png',
-                               enable=True
-                               )
+                             model='quad',
+                             scale=(0.05, 0.05),
+                             origin=(0, 0),
+                             position=(-0.05, 0),
+                             texture='./assets/textures/coin.png',
+                             enable=True
+                             )
 
     def update_value(self, new_value):
         self.text = str(new_value)
-
 
 
 player = Character()
@@ -410,6 +410,8 @@ if boss_battle == False:
 environementSounds = None
 coins = 200
 
+inventaire = {}
+
 # ------ STRUCTURES ------
 
 hut = Entity(model="./assets/models/hut.obj",
@@ -438,25 +440,43 @@ NpcToolTip.disable()
             texture='./assets/textures/guiThomas.png',
             enable=True)
          """
+
+
 class ShopButton(Button):
-    def __init__(self,title="Lorem Ipsum", defcolor=color.azure, cost=0,usercoins=100,**kwargs):
+    def __init__(self, title="Lorem Ipsum", defcolor=color.azure, cost=0, **kwargs):
         super().__init__(text=title, color=defcolor)
+
         def takemymoney():
-             moneyDp.update_value(str(usercoins - cost))
+            global coins
+            op = coins - cost
+            if (op > 0):
+                moneyDp.update_value(op)
+                coins = op
+            print(coins)
+            # TODO: implementer la logique pr donner l'argent
 
         self.on_click = takemymoney
 
+
 class GUIExitBtn(Button):
-    def __init__(self,gui=[], **kwargs):
+    def __init__(self, gui=[], **kwargs):
         super().__init__(text="Exit", color=color.red)
-        #self.on_click = gui.disable()
+
+        def closeGui():
+            global pause
+            player.position = Vec3(
+                player.position[0]+4, player.position[1], player.position[2]+2)
+            pause = False
+            mouse.locked = True
+
+        self.on_click = closeGui
 
 
 NpcThomasGUI = WindowPanel(
     title='Thomas - Forgeron',
     content=(
-        ShopButton(title="fdf", cost=32, usercoins=coins),
-        ShopButton(title="caca"),
+        ShopButton(title="Iron sword - 16p", cost=16),
+        ShopButton(title="Golden sword - 32p", cost=32),
         GUIExitBtn()
     ),
     popup=False,
@@ -506,31 +526,7 @@ for i in range(150):
     flower2 = Entity(
         model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, -45, 0), double_sided=True)
 
-""" # small grass
-for i in range(50):
-    max = 200
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    flower1 = Entity(
-        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower2 = Entity(
-        model="plane", texture="./assets/textures/plants/short_grass.png", position=pos, rotation=(270, -45, 0), double_sided=True, color=color.green)
-
-# tall grass
-for i in range(50):
-    max = 200
-    posBottom = (randint(-max, max), 0.5, randint(-max, max))
-    posTop = (posBottom[0], posBottom[1]+1, posBottom[2])
-    flower1Bottom = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower1Top = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, 45, 0), double_sided=True, color=color.green)
-    flower2Bottom = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_bottom.png", position=posBottom, rotation=(270, -45, 0), double_sided=True, color=color.green)
-    flower2Top = Entity(
-        model="plane", texture="./assets/textures/plants/tall_grass_top.png", position=posTop, rotation=(270, -45, 0), double_sided=True, color=color.green)
- """
-
-# ------ NATURES END ----from perlin_noise import PerlinNoise--
+# ------ NATURES END ----
 
 
 # ------ CLOUDS ------
@@ -553,7 +549,45 @@ def moveClouds():
 
 # ------ CLOUDS END ------
 
+
 moneyDp = MoneyDisplay(value=str(coins))
+
+
+class DroppedItem(Entity):
+    def __init__(self, modelEnt="cube", scaleEnt=1, colorEnt=color.red,
+                 textureEnt='', pos=(0, 0, 0), collider=None, coinValue=20):
+        super().__init__(
+            parent=scene,
+            model=modelEnt,
+            position=pos,
+            scale=scaleEnt,
+            color=colorEnt,
+            texture=textureEnt,
+            collider=collider
+        )
+        self.picked_up = False
+        self.coin_value = coinValue
+
+    def update(self):
+        global coins
+        if self.picked_up:
+            return
+        if distance(player.position, self.position) < 2:
+            inventaire[1] = "entité1"
+            print(inventaire)
+            self.picked_up = True
+            self.enabled = False
+            coins = self.coin_value + coins
+            moneyDp.update_value(coins)
+            print(coins)
+
+
+coin = DroppedItem(modelEnt="./assets/models/coin.obj",
+                   pos=(4, 0.125, 4),
+                   scaleEnt=0.125,
+                   colorEnt=color.yellow,
+                   coinValue=20)
+
 
 def update():
     vitesse = 4 * time.dt
@@ -571,9 +605,6 @@ def update():
     global path, moving
     global boss_battle
     global coins
-
-    #moneyDp.update_value("1000")
-    
 
     # ------ AUDIO environement ------
     if (not bgmusicIsPlaying):
@@ -727,6 +758,7 @@ def update():
         moveClouds()
         pause = displayForNpc(pause)
         # ThomasNpcTag.look_at(player.position)
+        coin.rotation_y += 50 * time.dt
 
 
 app.run()
