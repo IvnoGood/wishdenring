@@ -1,0 +1,683 @@
+# Blender 4.5.3 LTS MTL File: 'bar.blend'
+# www.blender.org
+
+newmtl TextureMaterial
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_689fb76.png
+map_d C:/_689fb76.png
+
+newmtl TextureMaterial_1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+
+map_Kd C:/_70709f4.png
+map_d C:/_70709f4.png
+
+newmtl TextureMaterial_10
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_d0b8846.png
+map_d C:/_d0b8846.png
+
+newmtl TextureMaterial_11
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_1ddfa81.png
+map_d C:/_1ddfa81.png
+
+newmtl TextureMaterial_12
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ea08ec9a.png
+map_d C:/ea08ec9a.png
+
+newmtl TextureMaterial_13
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_84f734e.png
+map_d C:/_84f734e.png
+
+newmtl TextureMaterial_14
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/defa4215.png
+map_d C:/defa4215.png
+
+newmtl TextureMaterial_15
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_ef5b813.png
+map_d C:/_ef5b813.png
+
+newmtl TextureMaterial_16
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_d30dcce.png
+map_d C:/_d30dcce.png
+
+newmtl TextureMaterial_17
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_fc93ae0.png
+map_d C:/_fc93ae0.png
+
+newmtl TextureMaterial_18
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/a4b9a15d.png
+map_d C:/a4b9a15d.png
+
+newmtl TextureMaterial_19
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_20a434d.png
+map_d C:/_20a434d.png
+
+newmtl TextureMaterial_2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_3634810.png
+map_d C:/_3634810.png
+
+newmtl TextureMaterial_20
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_fe3d3eb.png
+map_d C:/_fe3d3eb.png
+
+newmtl TextureMaterial_21
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_7ca316c.png
+map_d C:/_7ca316c.png
+
+newmtl TextureMaterial_22
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ab852f0b.png
+map_d C:/ab852f0b.png
+
+newmtl TextureMaterial_23
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_fbb14af.png
+map_d C:/_fbb14af.png
+
+newmtl TextureMaterial_24
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_b5bcefb.png
+map_d C:/_b5bcefb.png
+
+newmtl TextureMaterial_25
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/d7189db3.png
+map_d C:/d7189db3.png
+
+newmtl TextureMaterial_26
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_fa3ec9e.png
+map_d C:/_fa3ec9e.png
+
+newmtl TextureMaterial_27
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_08fbe89.png
+map_d C:/_08fbe89.png
+
+newmtl TextureMaterial_28
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_a2f1fea.png
+map_d C:/_a2f1fea.png
+
+newmtl TextureMaterial_29
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_2de2cbc.png
+map_d C:/_2de2cbc.png
+
+newmtl TextureMaterial_3
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/e8a87862.png
+map_d C:/e8a87862.png
+
+newmtl TextureMaterial_30
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ee28962b.png
+map_d C:/ee28962b.png
+
+newmtl TextureMaterial_31
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_6026c98.png
+map_d C:/_6026c98.png
+
+newmtl TextureMaterial_32
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_31e136a.png
+map_d C:/_31e136a.png
+
+newmtl TextureMaterial_33
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_09d4d1b.png
+map_d C:/_09d4d1b.png
+
+newmtl TextureMaterial_34
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ce459ff1.png
+map_d C:/ce459ff1.png
+
+newmtl TextureMaterial_35
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_38c6069.png
+map_d C:/_38c6069.png
+
+newmtl TextureMaterial_36
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/c44b2f65.png
+map_d C:/c44b2f65.png
+
+newmtl TextureMaterial_37
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_44dd66f.png
+map_d C:/_44dd66f.png
+
+newmtl TextureMaterial_38
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/aaeeb317.png
+map_d C:/aaeeb317.png
+
+newmtl TextureMaterial_39
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_45ed3e4.png
+map_d C:/_45ed3e4.png
+
+newmtl TextureMaterial_4
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_1a631ec.png
+map_d C:/_1a631ec.png
+
+newmtl TextureMaterial_40
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/b04dc09b.png
+map_d C:/b04dc09b.png
+
+newmtl TextureMaterial_41
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ead5ea7d.png
+map_d C:/ead5ea7d.png
+
+newmtl TextureMaterial_42
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_e92d0da.png
+map_d C:/_e92d0da.png
+
+newmtl TextureMaterial_43
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_bbdb67a.png
+map_d C:/_bbdb67a.png
+
+newmtl TextureMaterial_44
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_15b5308.png
+map_d C:/_15b5308.png
+
+newmtl TextureMaterial_45
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/aceca4a9.png
+map_d C:/aceca4a9.png
+
+newmtl TextureMaterial_46
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_ec9e76b.png
+map_d C:/_ec9e76b.png
+
+newmtl TextureMaterial_47
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_723b107.png
+map_d C:/_723b107.png
+
+newmtl TextureMaterial_48
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/ad2e5388.png
+map_d C:/ad2e5388.png
+
+newmtl TextureMaterial_49
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_c552036.png
+map_d C:/_c552036.png
+
+newmtl TextureMaterial_5
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_d710cf9.png
+map_d C:/_d710cf9.png
+
+newmtl TextureMaterial_50
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_73d8296.png
+map_d C:/_73d8296.png
+
+newmtl TextureMaterial_51
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_3491f15.png
+map_d C:/_3491f15.png
+
+newmtl TextureMaterial_52
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_b14503d.png
+map_d C:/_b14503d.png
+
+newmtl TextureMaterial_53
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_b7ec1f0.png
+map_d C:/_b7ec1f0.png
+
+newmtl TextureMaterial_54
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_4b4d1b2.png
+map_d C:/_4b4d1b2.png
+
+newmtl TextureMaterial_55
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_0dc0bbc.png
+map_d C:/_0dc0bbc.png
+
+newmtl TextureMaterial_56
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_9e307cd.png
+map_d C:/_9e307cd.png
+
+newmtl TextureMaterial_57
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_1172f2e.png
+map_d C:/_1172f2e.png
+
+newmtl TextureMaterial_58
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_114f436.png
+map_d C:/_114f436.png
+
+newmtl TextureMaterial_59
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_e3b90e1.png
+map_d C:/_e3b90e1.png
+
+newmtl TextureMaterial_6
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_e6d0a0f.png
+map_d C:/_e6d0a0f.png
+
+newmtl TextureMaterial_60
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/dac0e5a6.png
+map_d C:/dac0e5a6.png
+
+newmtl TextureMaterial_61
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_51168d3.png
+map_d C:/_51168d3.png
+
+newmtl TextureMaterial_62
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_d7b588a.png
+map_d C:/_d7b588a.png
+
+newmtl TextureMaterial_63
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_b494280.png
+map_d C:/_b494280.png
+
+newmtl TextureMaterial_64
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_9b92488.png
+map_d C:/_9b92488.png
+
+newmtl TextureMaterial_65
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_4cc8088.png
+map_d C:/_4cc8088.png
+
+newmtl TextureMaterial_66
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_7f3e713.png
+map_d C:/_7f3e713.png
+
+newmtl TextureMaterial_67
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_.png
+map_d C:/_.png
+
+newmtl TextureMaterial_7
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/_a1e7d44.png
+map_d C:/_a1e7d44.png
+
+newmtl TextureMaterial_8
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/cf87bcbf.png
+map_d C:/cf87bcbf.png
+
+newmtl TextureMaterial_9
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd C:/f44e11c5.png
+map_d C:/f44e11c5.png

@@ -13,6 +13,7 @@ from collections import deque
 from perlin_noise import PerlinNoise
 from time import time as tm
 from ursina.shaders import ssao_shader
+from ursina.prefabs.health_bar import HealthBar
 
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
 
@@ -132,13 +133,27 @@ class Enemies(Entity):
 
 
 enemy = Enemies()
+inventaire = {
+    0: {"model": "katana", "color": color.green},
+    1: {"model": "fiole", "color": color.yellow},
+    2: {"model": "fiole", "color": color.red},
+    3: {"model": "katana", "color": color.green},
+    4: {"model": "katana", "color": color.green},
+    5: {"model": "katana", "color": color.green},
+    6: {"model": "katana", "color": color.green},
+    7: {"model": "katana", "color": color.green},
+    8: {"model": "katana", "color": color.green}
+}
+
+slot_actuel = 0
 
 
-class BottomBar(Entity):
+class IventaireBas(Entity):
     def __init__(self):
         super().__init__(
             parent=camera.ui,
         )
+        self.invContent = []
 
         self.iventory = Entity(parent=self,
                                model='quad',
@@ -149,16 +164,17 @@ class BottomBar(Entity):
                                texture_scale=(8, 1),
                                enable=True
                                )
+        for key in inventaire:
+            slot = inventaire[0]
+            model = slot["model"]
+            color = slot["color"]
+            #! c full beugé
+            # newSlot = Entity(parent=self.iventory, model='quad', texture=f"./assets/textures/{model}.png", color=color, scale=1, origin=(0, 0), position=(0, 0), rotation=(45, 0, 0))
+            # self.invContent.append(newSlot)
 
-        self.health = Entity(parent=self,
-                             model='quad',
-                             scale=(0.32, 0.04),  # full = 0.32 50%: 16
-                             origin=(0, 0),
-                             position=(-0.6, -0.4),
-                             color=color.green,
-                             texture_scale=(8, 1),
-                             enable=True
-                             )
+
+health_bar_1 = HealthBar(bar_color=color.lime.tint(-.25),
+                         roundness=.2, max_value=100, value=50, scale=(0.32, 0.04), origin=(-0.5, 21))
 
 
 class MoneyDisplay(Text):
@@ -187,10 +203,82 @@ class MoneyDisplay(Text):
 
 
 player = Character()
-inv = BottomBar()
+inv = IventaireBas()
+speedFact = 4
+
+
+class HandItem(Entity):
+    def __init__(self, id='', entColor=''):
+
+        super().__init__(
+            parent=player,
+            model=f"./assets/models/{id}.obj",
+            rotation=(0, 0, 0),
+            position=(0.5, 0.5, 1),
+            scale=0.25,
+            color=entColor
+        )
+
+    def updItem(self, newVal):
+        self.color = newVal[0]
+        self.model = f"./assets/models/{newVal[1]}.obj"
+        self.modelName = newVal[1]
+
+    def update(self):
+        global speedFact
+
+        if (self.modelName == "katana"):
+            if held_keys["left mouse"]:
+                print("hit")
+                # TODO: ajouter log pour frapper
+
+        elif (self.modelName == "fiole"):
+            if held_keys["right mouse"]:
+                if (self.color == color.red):
+                    health_bar_1.value += 30
+
+                elif (self.color == color.yellow):
+                    speedFact = speedFact * 1.5
+
+                elif (self.color == color.magenta):
+                    # TODO: ajouter force ici
+                    pass
+
+                inventaire[slot_actuel] = {}
+                time.sleep(0.125)
+
+
+handItem = HandItem(id="fiole", entColor=color.yellow)
+
+
+def controlHotbar():
+    global slot_actuel, inventaire
+    if held_keys["1"]:
+        slot_actuel = 0
+    elif held_keys["2"]:
+        slot_actuel = 1
+    elif held_keys["3"]:
+        slot_actuel = 2
+    elif held_keys["4"]:
+        slot_actuel = 3
+    elif held_keys["5"]:
+        slot_actuel = 4
+    elif held_keys["6"]:
+        slot_actuel = 5
+    elif held_keys["7"]:
+        slot_actuel = 6
+    elif held_keys["8"]:
+        slot_actuel = 7
+    slotData = inventaire[slot_actuel]
+    if ("color" in slotData and "model" in slotData):
+        handItem.enable()
+        slotUpd = [slotData["color"], slotData["model"]]
+        handItem.updItem(slotUpd)
+    else:
+        handItem.disable()
+
 
 player.height = 1
-
 player.cursor = Entity(parent=camera.ui, model='quad',
                        color=color.pink, scale=.008, rotation_z=45)
 
@@ -410,20 +498,31 @@ if boss_battle == False:
 environementSounds = None
 coins = 200
 
-inventaire = {}
 
 # ------ STRUCTURES ------
 
-hut = Entity(model="./assets/models/hut.obj",
-             scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
+ThomasHut = Entity(model="./assets/models/hut.obj",
+                   scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
 
-ThoamsNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
+ThomasNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
                                                            1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
 ThomasNpcTag = Entity(model="plane", rotation=(
-    270, 0, 0), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
+    270, 0, 25), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
 
-NpcToolTip = Text("Appuie sur T pour discuter")
-NpcToolTip.disable()
+NpcThomasToolTip = Text("Appuie sur T pour discuter")
+NpcThomasToolTip.disable()
+
+
+AlexaHut = Entity(model="./assets/models/hut.obj",
+                  scale=(2.5, 2.5, 2.5), collider="mesh", position=(13, 0, 12), rotation=(0, -315, 0))
+
+AlexaNpc = Entity(model="./assets/models/MEDICAL_SISTER.obj", position=(16, 0, 12),
+                  collider="box", scale=0.01, ignore=True, origin_y=0, texture="./assets/textures/MEDICAL_SISTER_BaseColor.png", double_sided=True, rotation=(0, -145, 0))
+AlexaNpcTag = Entity(model="plane", rotation=(
+    270, 0, -25), texture="./assets/textures/alexa_affichage.png", double_sided=True,  position=(16, 2.5, 12), scale=(2, 1, 1))
+
+AlexaToolTip = Text("Appuie sur T pour discuter")
+AlexaToolTip.disable()
 
 
 """ class ThomasGUI(Entity):
@@ -443,7 +542,7 @@ NpcToolTip.disable()
 
 
 class ShopButton(Button):
-    def __init__(self, title="Lorem Ipsum", defcolor=color.azure, cost=0, **kwargs):
+    def __init__(self, title="Lorem Ipsum", defcolor=color.azure, cost=0, model="./assets/models/fiole.obj", color=color.white, ** kwargs):
         super().__init__(text=title, color=defcolor)
 
         def takemymoney():
@@ -452,8 +551,18 @@ class ShopButton(Button):
             if (op > 0):
                 moneyDp.update_value(op)
                 coins = op
-            print(coins)
-            # TODO: implementer la logique pr donner l'argent
+
+            global found
+            found = False
+            for key in inventaire:
+                if ("color" not in inventaire[key] and "model" not in inventaire[key]):
+                    print("slot: ", key, " is empty !")
+                    inventaire[key] = {"model": model, "color": color}
+                    found = True
+                    break
+            if not found:
+                print("no space left")
+                moneyDp.update_value(coins + cost)
 
         self.on_click = takemymoney
 
@@ -475,8 +584,10 @@ class GUIExitBtn(Button):
 NpcThomasGUI = WindowPanel(
     title='Thomas - Forgeron',
     content=(
-        ShopButton(title="Iron sword - 16p", cost=16),
-        ShopButton(title="Golden sword - 32p", cost=32),
+        ShopButton(title="Iron sword - 16p", cost=16,
+                   model="katana", color=color.gray),
+        ShopButton(title="Golden sword - 32p", cost=32,
+                   model="katana", color=color.gold),
         GUIExitBtn()
     ),
     popup=False,
@@ -486,21 +597,49 @@ NpcThomasGUI.y = NpcThomasGUI.panel.scale_y / 2 * NpcThomasGUI.scale_y
 NpcThomasGUI.layout()
 NpcThomasGUI.disable()
 
+NpcAlexaGUI = WindowPanel(
+    title='Alexa - Forgeron',
+    content=(
+        ShopButton(title="Popo heal - 16p", cost=16,
+                   model="fiole", color=color.red),
+        ShopButton(title="Popo speed - 32p", cost=32,
+                   model="fiole", color=color.yellow),
+        GUIExitBtn()
+    ),
+    popup=False,
+    Draggable=False
+)
+NpcAlexaGUI.y = NpcAlexaGUI.panel.scale_y / 2 * NpcAlexaGUI.scale_y
+NpcAlexaGUI.layout()
+NpcAlexaGUI.disable()
+
 
 def displayForNpc(pause):
-    if (distance(player, ThoamsNpc) < 3):
-        NpcToolTip.enable()
+    if (distance(player, ThomasNpc) < 3):
+        NpcThomasToolTip.enable()
         if (held_keys["t"]):
             print("opened gui")
-            NpcToolTip.disable()
+            NpcThomasToolTip.disable()
             time.sleep(0.25)
             mouse.locked = False
             pause = True
             NpcThomasGUI.enable()
         return pause
+    elif (distance(player, AlexaNpc) < 3):
+        AlexaToolTip.enable()
+        if (held_keys["t"]):
+            print("opened gui")
+            AlexaToolTip.disable()
+            time.sleep(0.25)
+            mouse.locked = False
+            pause = True
+            NpcAlexaGUI.enable()
+        return pause
     else:
-        NpcToolTip.disable()
+        NpcThomasToolTip.disable()
         NpcThomasGUI.disable()
+        AlexaToolTip.disable()
+        NpcAlexaGUI.disable()
         return pause
 
 # ------ STRUCTURES END ------
@@ -510,7 +649,7 @@ def displayForNpc(pause):
 
 # Flowers
 for i in range(25):
-    max = 200
+    max = 100
     pos = (randint(-max, max), 0.5, randint(-max, max))
     flower1 = Entity(
         model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, 45, 0), double_sided=True)
@@ -518,7 +657,7 @@ for i in range(25):
         model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
 
 for i in range(150):
-    max = 200
+    max = 100
     pos = (randint(-max, max), 0.5, randint(-max, max))
     type = randint(1, 3)
     flower1 = Entity(
@@ -555,7 +694,7 @@ moneyDp = MoneyDisplay(value=str(coins))
 
 class DroppedItem(Entity):
     def __init__(self, modelEnt="cube", scaleEnt=1, colorEnt=color.red,
-                 textureEnt='', pos=(0, 0, 0), collider=None, coinValue=20):
+                 textureEnt='', pos=(0, 0, 0), collider=None, coinValue=0):
         super().__init__(
             parent=scene,
             model=modelEnt,
@@ -588,10 +727,24 @@ coin = DroppedItem(modelEnt="./assets/models/coin.obj",
                    colorEnt=color.yellow,
                    coinValue=20)
 
+erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
+                     pos=(6, 0.5, 7),
+                     scaleEnt=0.25,
+                     colorEnt=color.red)
+
+erlenG = DroppedItem(modelEnt="./assets/models/fiole.obj",
+                     pos=(6, 1.5, 7),
+                     scaleEnt=0.25,
+                     colorEnt=color.green)
+
+erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
+                     pos=(6, 2.5, 7),
+                     scaleEnt=0.25,
+                     colorEnt=color.magenta)
+
 
 def update():
-    vitesse = 4 * time.dt
-    global vitesse_chute
+    global vitesse_chute, speedFact
     global last_checkpoint
     global sensitivity
     global pause
@@ -629,7 +782,7 @@ def update():
         player.camera_pivot.rotation_x = clamp(
             player.camera_pivot.rotation_x, -90, 90)
 
-    vitesse = 4 * time.dt
+    vitesse = speedFact * time.dt
     direction = Vec3(camera.forward.x, 0, camera.forward.z).normalized()
 
     move = Vec3(0, 0, 0)
@@ -759,6 +912,7 @@ def update():
         pause = displayForNpc(pause)
         # ThomasNpcTag.look_at(player.position)
         coin.rotation_y += 50 * time.dt
+        controlHotbar()
 
 
 app.run()
