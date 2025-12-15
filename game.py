@@ -563,6 +563,7 @@ class ShopButton(Button):
             if not found:
                 print("no space left")
                 moneyDp.update_value(coins + cost)
+                coins = coins + cost
 
         self.on_click = takemymoney
 
