@@ -134,25 +134,25 @@ class Enemies(Entity):
 enemy = Enemies()
 
 pv_enemy_boss = 5
-pv_enemy_boss_max= 5
+pv_enemy_boss_max = 5
 
 barre_de_vie_enemy = Entity(parent=enemy,
                             model='cube',
-                            color=color.green,
-                            position=(0, 2.85, 0),
+                            color=color.red,
+                            position=(0, 3.85, 0),
                             scale=(2.5, 0.1, 0.1))
 
 
 inventaire = {
-    0: {"model": "katana", "color": color.green},
-    1: {"model": "fiole", "color": color.yellow},
-    2: {"model": "fiole", "color": color.red},
-    3: {"model": "katana", "color": color.green},
-    4: {"model": "katana", "color": color.green},
-    5: {"model": "katana", "color": color.green},
-    6: {"model": "katana", "color": color.green},
-    7: {"model": "katana", "color": color.green},
-    8: {"model": "katana", "color": color.green}
+    0: {"model": "katana", "color": color.brown},
+    1: {},
+    2: {},
+    3: {},
+    4: {},
+    5: {},
+    6: {},
+    7: {},
+    8: {}
 }
 
 slot_actuel = 0
@@ -178,7 +178,7 @@ class IventaireBas(Entity):
             slot = inventaire[0]
             model = slot["model"]
             color = slot["color"]
-            #! c full beugé
+            #! c full beugé donc pas d'affichage d'inv
             # newSlot = Entity(parent=self.iventory, model='quad', texture=f"./assets/textures/{model}.png", color=color, scale=1, origin=(0, 0), position=(0, 0), rotation=(45, 0, 0))
             # self.invContent.append(newSlot)
 
@@ -215,6 +215,7 @@ class MoneyDisplay(Text):
 player = Character()
 inv = IventaireBas()
 speedFact = 4
+degatEpee = 1
 
 
 class HandItem(Entity):
@@ -226,7 +227,8 @@ class HandItem(Entity):
             rotation=(0, 0, 0),
             position=(0.5, 0.5, 1),
             scale=0.25,
-            color=entColor
+            color=entColor,
+            collider="mesh"
         )
 
     def updItem(self, newVal):
@@ -235,11 +237,24 @@ class HandItem(Entity):
         self.modelName = newVal[1]
 
     def update(self):
-        global speedFact
+        global speedFact, degatEpee
 
         if (self.modelName == "katana"):
             if held_keys["left mouse"]:
-                print("hit")
+                if (self.color == color.brown):
+                    degatEpee = 1
+
+                elif (self.color == color.gray):
+                    degatEpee = 2
+
+                elif (self.color == color.gold):
+                    degatEpee = 3
+
+                elif (self.color == color.magenta):
+                    degatEpee = 4
+                """ self.rotation_x = 90
+                time.sleep(0.25)
+                self.rotation_x = 0 """
                 # TODO: ajouter log pour frapper
 
         elif (self.modelName == "fiole"):
@@ -504,7 +519,7 @@ sky_image = load_texture("./assets/textures/environement/sunset.jpg")
 sky = Sky(color=color.white, texture=sky_image)
 boss_battle = False
 if boss_battle == False:
-    sky.color = color.white
+    sky.texture = "./assets/textures/environement/sunset.jpg"
 
 environementSounds = None
 coins = 200
@@ -596,9 +611,13 @@ class GUIExitBtn(Button):
 NpcThomasGUI = WindowPanel(
     title='Thomas - Forgeron',
     content=(
-        ShopButton(title="Iron sword - 16p", cost=16,
+        ShopButton(title="Epée en bois - 16p", cost=16,
                    model="katana", color=color.gray),
-        ShopButton(title="Golden sword - 32p", cost=32,
+        ShopButton(title="Epée en fer - 128p", cost=128,
+                   model="katana", color=color.gray),
+        ShopButton(title="Epée en or - 256p", cost=256,
+                   model="katana", color=color.gold),
+        ShopButton(title="Epée en améthyste - 500p", cost=500,
                    model="katana", color=color.gold),
         GUIExitBtn()
     ),
@@ -660,7 +679,7 @@ def displayForNpc(pause):
 # ------ NATURES ------
 
 # Flowers
-for i in range(25):
+for i in range(0):
     max = 100
     pos = (randint(-max, max), 0.5, randint(-max, max))
     flower1 = Entity(
@@ -668,7 +687,7 @@ for i in range(25):
     flower2 = Entity(
         model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
 
-for i in range(150):
+for i in range(0):
     max = 100
     pos = (randint(-max, max), 0.5, randint(-max, max))
     type = randint(1, 3)
@@ -754,22 +773,24 @@ erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      scaleEnt=0.25,
                      colorEnt=color.magenta)
 
+
 def degat():
-    global pv_enemy_boss,pv_enemy_boss_max,delay
-    print("Point 3D sous la souris :", mouse.world_point)
-    calc = pv_enemy_boss - 1
+    global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee
+    # print("Point 3D sous la souris :", mouse.world_point)
+    calc = pv_enemy_boss - degatEpee
     if (calc <= 0):
-        print(calc)
-        print("&")
         enemy.visible = False
         enemy.collider = None
         boss_win = True
     else:
-        print(calc)
         pv_enemy_boss -= 1
-        barre_de_vie_enemy.scale = (2.5-0.5*(abs(pv_enemy_boss-pv_enemy_boss_max)), 0.1, 0.1)
+        barre_de_vie_enemy.scale = (
+            2.5-0.5*(abs(pv_enemy_boss-pv_enemy_boss_max)), 0.1, 0.1)
+
+
 delay = 1
 start = time.time()
+
 
 def update():
     global vitesse_chute, speedFact
@@ -786,16 +807,15 @@ def update():
     global path, moving
     global boss_battle
     global coins
-    global degat,delay,start
+    global degat, delay, start
 
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
-            print('ntm')
             degat()
-   
+
     direction_x = player.x - enemy.x
-    direction_z = player.z - enemy.z        
+    direction_z = player.z - enemy.z
     if enemy.hovered and distance(player, enemy) <= 9:
         enemy.color = color.gray
     else:
@@ -883,7 +903,7 @@ def update():
         player.position = (last_checkpoint.x,
                            last_checkpoint.y + 2, last_checkpoint.z)
         boss_battle = False
-        sky.color = color.white
+        sky.texture = "./assets/textures/environement/sunset.jpg"
 
     user_data[str(random_uuid)]['player']['location'] = tuple(player.position)
     user_data[str(random_uuid)]['player']['rotation'] = [
@@ -918,7 +938,7 @@ def update():
             msg.enable()
             invoke(lambda: msg.animate('alpha', 0, duration=1), delay=2)
             boss_battle = True
-            sky.color = color.red
+            sky.texture = "./assets/textures/environement/chaos.jpg"
             player.position = (500, 2, 500)
 
     enemy_pos = (round(enemy.x), round(enemy.z))
