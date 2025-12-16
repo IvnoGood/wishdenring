@@ -10,7 +10,6 @@ import asyncio
 from time import sleep
 import argparse
 from collections import deque
-from perlin_noise import PerlinNoise
 from time import time as tm
 from ursina.shaders import ssao_shader
 from ursina.prefabs.health_bar import HealthBar
@@ -133,6 +132,17 @@ class Enemies(Entity):
 
 
 enemy = Enemies()
+
+pv_enemy_boss = 5
+pv_enemy_boss_max= 5
+
+barre_de_vie_enemy = Entity(parent=enemy,
+                            model='cube',
+                            color=color.green,
+                            position=(0, 2.85, 0),
+                            scale=(2.5, 0.1, 0.1))
+
+
 inventaire = {
     0: {"model": "katana", "color": color.green},
     1: {"model": "fiole", "color": color.yellow},
@@ -234,6 +244,7 @@ class HandItem(Entity):
 
         elif (self.modelName == "fiole"):
             if held_keys["right mouse"]:
+                print("heal")
                 if (self.color == color.red):
                     health_bar_1.value += 30
 
@@ -743,6 +754,22 @@ erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      scaleEnt=0.25,
                      colorEnt=color.magenta)
 
+def degat():
+    global pv_enemy_boss,pv_enemy_boss_max,delay
+    print("Point 3D sous la souris :", mouse.world_point)
+    calc = pv_enemy_boss - 1
+    if (calc <= 0):
+        print(calc)
+        print("&")
+        enemy.visible = False
+        enemy.collider = None
+        boss_win = True
+    else:
+        print(calc)
+        pv_enemy_boss -= 1
+        barre_de_vie_enemy.scale = (2.5-0.5*(abs(pv_enemy_boss-pv_enemy_boss_max)), 0.1, 0.1)
+delay = 1
+start = time.time()
 
 def update():
     global vitesse_chute, speedFact
@@ -759,6 +786,21 @@ def update():
     global path, moving
     global boss_battle
     global coins
+    global degat,delay,start
+
+    if held_keys['left mouse'] and distance(player, enemy) <= 9:
+        if time.time() - start >= delay:
+            start = time.time()
+            print('ntm')
+            degat()
+   
+    direction_x = player.x - enemy.x
+    direction_z = player.z - enemy.z        
+    if enemy.hovered and distance(player, enemy) <= 9:
+        enemy.color = color.gray
+    else:
+        enemy.color = color.white
+    enemy.look_at(enemy.position + (direction_x, 0, direction_z))
 
     # ------ AUDIO environement ------
     if (not bgmusicIsPlaying):
