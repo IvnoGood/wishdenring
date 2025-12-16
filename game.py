@@ -144,7 +144,7 @@ barre_de_vie_enemy = Entity(parent=enemy,
 
 
 inventaire = {
-    0: {"model": "katana", "color": color.brown},
+    0: {"model": "katana", "color": color.magenta},
     1: {},
     2: {},
     3: {},
@@ -242,16 +242,16 @@ class HandItem(Entity):
         if (self.modelName == "katana"):
             if held_keys["left mouse"]:
                 if (self.color == color.brown):
-                    degatEpee = 1
-
-                elif (self.color == color.gray):
                     degatEpee = 2
 
-                elif (self.color == color.gold):
+                elif (self.color == color.gray):
                     degatEpee = 3
 
-                elif (self.color == color.magenta):
+                elif (self.color == color.gold):
                     degatEpee = 4
+
+                elif (self.color == color.magenta):
+                    degatEpee = 5
                 """ self.rotation_x = 90
                 time.sleep(0.25)
                 self.rotation_x = 0 """
@@ -267,7 +267,7 @@ class HandItem(Entity):
                     speedFact = speedFact * 1.5
 
                 elif (self.color == color.magenta):
-                    # TODO: ajouter force ici
+                    degatEpee = degatEpee * 2
                     pass
 
                 inventaire[slot_actuel] = {}
@@ -522,7 +522,7 @@ if boss_battle == False:
     sky.texture = "./assets/textures/environement/sunset.jpg"
 
 environementSounds = None
-coins = 200
+coins = 0
 
 
 # ------ STRUCTURES ------
@@ -631,9 +631,9 @@ NpcThomasGUI.disable()
 NpcAlexaGUI = WindowPanel(
     title='Alexa - Forgeron',
     content=(
-        ShopButton(title="Popo heal - 16p", cost=16,
+        ShopButton(title="Potion de régénération - 32p", cost=32,
                    model="fiole", color=color.red),
-        ShopButton(title="Popo speed - 32p", cost=32,
+        ShopButton(title="Potion de céléritée - 32p", cost=32,
                    model="fiole", color=color.yellow),
         GUIExitBtn()
     ),
@@ -725,7 +725,7 @@ moneyDp = MoneyDisplay(value=str(coins))
 
 class DroppedItem(Entity):
     def __init__(self, modelEnt="cube", scaleEnt=1, colorEnt=color.red,
-                 textureEnt='', pos=(0, 0, 0), collider=None, coinValue=0):
+                 textureEnt='', pos=(0, 0, 0), collider=None, coinValue=0, modelName="coin"):
         super().__init__(
             parent=scene,
             model=modelEnt,
@@ -735,53 +735,84 @@ class DroppedItem(Entity):
             texture=textureEnt,
             collider=collider
         )
+        self.modelName = modelName
         self.picked_up = False
         self.coin_value = coinValue
 
     def update(self):
+        self.rotation_y += 50 * time.dt
         global coins
         if self.picked_up:
             return
         if distance(player.position, self.position) < 2:
-            inventaire[1] = "entité1"
-            print(inventaire)
-            self.picked_up = True
-            self.enabled = False
-            coins = self.coin_value + coins
-            moneyDp.update_value(coins)
-            print(coins)
+            print(self.modelName)
+            if (self.modelName == "coin"):
+                coins = self.coin_value + coins
+                moneyDp.update_value(coins)
+                print(coins)
+                self.picked_up = True
+                self.enabled = False
+            else:
+                global found
+                found = False
+                for key in inventaire:
+                    if ("color" not in inventaire[key] and "model" not in inventaire[key]):
+                        print("slot: ", key, " is empty !")
+                        inventaire[key] = {"model": self.modelName, "color": self.color}
+                        found = True
+                        self.picked_up = True
+                        self.enabled = False
+                        break
 
-
+""" 
 coin = DroppedItem(modelEnt="./assets/models/coin.obj",
                    pos=(4, 0.125, 4),
                    scaleEnt=0.125,
                    colorEnt=color.yellow,
+                   modelName="coin",
                    coinValue=20)
 
 erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      pos=(6, 0.5, 7),
                      scaleEnt=0.25,
-                     colorEnt=color.red)
+                     colorEnt=color.red,
+                     modelName="fiole")
 
 erlenG = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      pos=(6, 1.5, 7),
                      scaleEnt=0.25,
-                     colorEnt=color.green)
+                     colorEnt=color.green,
+                     modelName="fiole")
 
 erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      pos=(6, 2.5, 7),
                      scaleEnt=0.25,
-                     colorEnt=color.magenta)
+                     colorEnt=color.magenta,
+                     modelName="fiole") """
 
+boss_win = False
+tp_grotte_boss = Entity(model='cube', 
+                scale=(2.5, 4, 2.5), 
+                position=(0,0,0), 
+                collider='box', texture='brick', color=color.black, texture_scale=(10, 10))
+tp_grotte_boss.collider = None
+tp_grotte_boss.visible = None
 
 def degat():
-    global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee
+    global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee, boss_win
     # print("Point 3D sous la souris :", mouse.world_point)
     calc = pv_enemy_boss - degatEpee
     if (calc <= 0):
         enemy.visible = False
         enemy.collider = None
         boss_win = True
+        location = enemy.position
+        coin = DroppedItem(modelEnt="./assets/models/coin.obj",
+                   pos=location,
+                   scaleEnt=0.125,
+                   colorEnt=color.yellow,
+                   modelName="coin",
+                   coinValue=50)
     else:
         pv_enemy_boss -= 1
         barre_de_vie_enemy.scale = (
@@ -808,11 +839,28 @@ def update():
     global boss_battle
     global coins
     global degat, delay, start
+    global pv_enemy_boss
 
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
             degat()
+
+    if (boss_win):
+        #la partie reprise de combat ca marche pas trop prblm pv boss + tp qiu se dep
+        tp_grotte_boss.collider = "box"
+        tp_grotte_boss.visible = True
+        tp_grotte_boss.position = (enemy.position[0]+4,enemy.position[1],enemy.position[2] )
+
+        if distance(tp_grotte_boss, player) < 2:
+            player.position = (0,1,0)
+            sky.texture = "./assets/textures/environement/sunset.jpg"
+            boss_battle = False
+            enemy.visible = True
+            enemy.collider = "box"
+            pv_enemy_boss = 15
+            tp_grotte_boss.collider = None
+            tp_grotte_boss.visible = None
 
     direction_x = player.x - enemy.x
     direction_z = player.z - enemy.z
@@ -936,6 +984,8 @@ def update():
         if distance(player.position, tp_grotte[i].position) <= 2.5:
             print("Début combat de boss")
             msg.enable()
+            tp_grotte_boss.collider = None
+            tp_grotte_boss.visible = None
             invoke(lambda: msg.animate('alpha', 0, duration=1), delay=2)
             boss_battle = True
             sky.texture = "./assets/textures/environement/chaos.jpg"
@@ -973,8 +1023,6 @@ def update():
 
         moveClouds()
         pause = displayForNpc(pause)
-        # ThomasNpcTag.look_at(player.position)
-        coin.rotation_y += 50 * time.dt
         controlHotbar()
 
 
