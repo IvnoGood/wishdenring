@@ -11,15 +11,10 @@ from time import sleep
 import argparse
 from collections import deque
 from time import time as tm
-from ursina.shaders import ssao_shader
 from ursina.prefabs.health_bar import HealthBar
+#from ursina.shaders import lit_with_shadows_shader 
 
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
-
-
-class Character(Entity):
-    def __init__(self, position=(0, 0.5, 0)):
-        self.block = Entity()
 
 
 structure_grotte = {
@@ -213,6 +208,7 @@ class MoneyDisplay(Text):
 
 
 player = Character()
+player.position = (1,5,1)
 inv = IventaireBas()
 speedFact = 4
 degatEpee = 1
@@ -225,7 +221,7 @@ class HandItem(Entity):
             parent=player,
             model=f"./assets/models/{id}.obj",
             rotation=(0, 0, 0),
-            position=(0.5, 0.5, 1),
+            position=(0.5, .5, 1),
             scale=0.25,
             color=entColor,
             collider="mesh"
@@ -319,9 +315,11 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 
 # ------ TERRAIN ------
-sol = Entity(model='plane', scale=264, texture='grass',
-             collider='box', origin_y=0, texture_scale=(200, 200))
+#structSol = Entity(model='./assets/models/ile2.obj', scale=(1, 1,1), color=color.gray,collider='mesh', origin_y=0,shader=lit_with_shadows_shader)
 
+sol = Entity(model="./assets/models/baseIle.obj", scale=(2, 1,2), texture='./assets/textures/bricks.png', collider='mesh', origin_y=0.5, texture_scale=(64, 64), double_sided=True)
+
+DirectionalLight(parent=scene, y=2, z=10, shadows=True, rotation=(45, -45, 45))
 """ noise = PerlinNoise(octaves=3, seed=0)
 amp = 2
 freq = 24
@@ -364,7 +362,6 @@ print("took", end-start, "seconds to generate terrain")
 
  """
 # ------ END TERRAIN ------
-
 player.rotation_y = 180
 vitesse_chute = 0
 force_gravite = -1.5
@@ -515,11 +512,11 @@ camera.fov = 90
 camera.parent = player.camera_pivot   # <- essentiel pour FPS
 camera.position = Vec3(0, 0, 0)
 pause = False
-sky_image = load_texture("./assets/textures/environement/sunset.jpg")
+sky_image = load_texture("./assets/textures/environement/stars-at-night-sky.png")
 sky = Sky(color=color.white, texture=sky_image)
 boss_battle = False
 if boss_battle == False:
-    sky.texture = "./assets/textures/environement/sunset.jpg"
+    sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
 
 environementSounds = None
 coins = 0
@@ -854,7 +851,7 @@ def update():
 
         if distance(tp_grotte_boss, player) < 2:
             player.position = (0,1,0)
-            sky.texture = "./assets/textures/environement/sunset.jpg"
+            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
             boss_battle = False
             enemy.visible = True
             enemy.collider = "box"
@@ -947,11 +944,11 @@ def update():
             # met une vitesse de chute positive pour que le joueur "tombe" vers le haut puis il chute avec la
             vitesse_chute = 6
         # gravité
-    if player.y <= -5:
+    if player.y <= -15:
         player.position = (last_checkpoint.x,
                            last_checkpoint.y + 2, last_checkpoint.z)
         boss_battle = False
-        sky.texture = "./assets/textures/environement/sunset.jpg"
+        sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
 
     user_data[str(random_uuid)]['player']['location'] = tuple(player.position)
     user_data[str(random_uuid)]['player']['rotation'] = [

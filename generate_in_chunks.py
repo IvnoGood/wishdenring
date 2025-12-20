@@ -37,39 +37,39 @@ for x in range(-8, 9):
 print(chunks)
 print(len(chunks))
 
-""" for chunk in chunks:
+for chunk in chunks:
     sol = Entity(model="cube", position=chunk,
                  color=[color.red, color.blue, color.yellow, color.green][randint(0, 3)], scale=(16, 1, 16))
- """  # ca affiche tous les chunks avec des petits carrés mais c'est que pr le test
+  # ca affiche tous les chunks avec des petits carrés mais c'est que pr le test
 
 
 def update():  # boucle qui s'execute a chque frame
     global flowers, grass
     for i in range(len(chunks)):
         if (distance(player.position, chunks[i])) <= sqrt(128):
+            #print("chunk actuel: ",  chunks[i])
             """ on vérifie la ditance avec le joueur et le centre du chunk 
             si inf a la val
             (trouvée grace au théorème de pythagore pour avoir les coins c'est pas le plus précis mais ca marche pr ca) 
              alors suite """
             if (str(chunks[i]) in chunkData):
                 # on vérifie si le chunk a déja été enregistré
-                print("already in it")
+                #print("already in it")
                 pass
             else:
                 print(chunks[i])
-                # on vas chercher toutes les coordonnées dans le chunk dans x
-                for x in range(chunks[i][0]+(-8), chunks[i][2]+8):
-                    # on vas chercher toutes les coordonnées dans le chunk dans y
-                    for y in range(chunks[i][0]+(-8), chunks[i][2]+8):
-                        print("Range is: ", chunks[i][0]+(-8), chunks[i][0]+8,
-                              " chunk is: ", chunks[i], " player is at: ", player.position)
-                        # ici c le hasard pr générer des plantes c'est pas non plus le meilleur mais c simple et ca marche
-                        random_fact = randint(1, 64)
-                        if (random_fact == 1):
-                            # on stocke ces vals dans un dict
-                            grass[x, .5, y] = (x, .5, y)
-                        if (random_fact == 2):
-                            flowers[x, .5, y] = (x, .5, y)
+                hashed = str(abs(hash(chunks[i]))) # on enlève le moins devant pour ceux qui en ont un
+                print("Hash: ", hashed, " len of hash: ", len(hashed))
+                print(hashed[-19])
+                grassNum = round(int(hashed[len(hashed)-1])/2) # on récup le nmb d'herbes gen dans le chunk avc le dernier char du hash
+                print("Number of grass: ", grassNum)
+
+                round(int(hashed[len(hashed)-1])/2)
+
+                for j in range(2, 19, 2):
+                    print("Coords: ",(int(hashed[-j])*2, int(hashed[-j])+(-1)*2))
+                    
+
                 chunkData[str(chunks[i])] = {
                     "grass": grass,
                     "flowers": flowers
