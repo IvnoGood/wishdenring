@@ -96,14 +96,13 @@ class Enemies(Entity):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
         super().__init__(position=Vec3(*position), **kwargs)
-
+        collision='box'
         # Create children using local coordinates and parent=self so moving this Entity moves them all
         self.sphere = Entity(
             parent=self,
             model='sphere',
             color=color.blue,
             position=Vec3(0, 0, 0),
-            collider='mesh',
             scale=1
         )
 
@@ -113,7 +112,6 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 1.25, 0),
             scale=Vec3(1, 2, 1),
-            collider='mesh'
         )
 
         self.head = Entity(
@@ -122,14 +120,13 @@ class Enemies(Entity):
             texture='shrek_face.jpg',
             position=Vec3(0, 2.75, 0),
             scale=Vec3(1, 1, 1),
-            collider='mesh',
         )
 
 
 enemy = Enemies()
 
-pv_enemy_boss = 5
-pv_enemy_boss_max = 5
+pv_enemy_boss = 25
+pv_enemy_boss_max = 25
 
 barre_de_vie_enemy = Entity(parent=enemy,
                             model='cube',
@@ -212,7 +209,7 @@ player.position = (1,5,1)
 inv = IventaireBas()
 speedFact = 4
 degatEpee = 1
-
+start_epee = time.time()
 
 class HandItem(Entity):
     def __init__(self, id='', entColor=''):
@@ -227,6 +224,10 @@ class HandItem(Entity):
             collider="mesh"
         )
 
+        self.origin = (0, -0.5, 0)
+        self.rotation = (0, 0, 0)
+        self.swinging = False
+
     def updItem(self, newVal):
         self.color = newVal[0]
         self.model = f"./assets/models/{newVal[1]}.obj"
@@ -236,7 +237,9 @@ class HandItem(Entity):
         global speedFact, degatEpee
 
         if (self.modelName == "katana"):
-            if held_keys["left mouse"]:
+            if held_keys["left mouse"]:            
+                if held_keys["left mouse"] and self.swinging == False:
+                    self.swing()
                 if (self.color == color.brown):
                     degatEpee = 2
 
@@ -268,7 +271,31 @@ class HandItem(Entity):
 
                 inventaire[slot_actuel] = {}
                 time.sleep(0.125)
+                
+    def swing(self):
+        global start_epee
+        if time.time() - start_epee >= 1:
+            start_epee = time.time()
+            self.swinging = True
+            print('swing')
+            self.animate_rotation(
+                Vec3(90, -20, 0),
+                duration=0.5,
+                curve=curve.out_quad
+            )
 
+            invoke(self.reset_rotation, delay=0.5)
+
+    def reset_rotation(self):
+        self.animate_rotation(
+            Vec3(0, 0, 0),
+            duration=0.1,
+            curve=curve.in_quad
+        )
+        self.swinging = False
+        print('not swinging')
+
+        
 
 handItem = HandItem(id="fiole", entColor=color.yellow)
 
@@ -319,7 +346,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 sol = Entity(model="./assets/models/baseIle.obj", scale=(2, 1,2), texture='./assets/textures/bricks.png', collider='mesh', origin_y=0.5, texture_scale=(64, 64), double_sided=True)
 
-DirectionalLight(parent=scene, y=2, z=10, shadows=True, rotation=(45, -45, 45))
+#DirectionalLight(parent=scene, y=2, z=10, shadows=True, rotation=(45, -45, 45))
 """ noise = PerlinNoise(octaves=3, seed=0)
 amp = 2
 freq = 24
@@ -530,7 +557,7 @@ ThomasHut = Entity(model="./assets/models/hut.obj",
 ThomasNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
                                                            1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
 ThomasNpcTag = Entity(model="plane", rotation=(
-    270, 0, 25), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
+    270, 0, 25), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727),texture_scale=(1,1), scale=(2, 1, 1))
 
 NpcThomasToolTip = Text("Appuie sur T pour discuter")
 NpcThomasToolTip.disable()
@@ -542,7 +569,7 @@ AlexaHut = Entity(model="./assets/models/hut.obj",
 AlexaNpc = Entity(model="./assets/models/MEDICAL_SISTER.obj", position=(16, 0, 12),
                   collider="box", scale=0.01, ignore=True, origin_y=0, texture="./assets/textures/MEDICAL_SISTER_BaseColor.png", double_sided=True, rotation=(0, -145, 0))
 AlexaNpcTag = Entity(model="plane", rotation=(
-    270, 0, -25), texture="./assets/textures/alexa_affichage.png", double_sided=True,  position=(16, 2.5, 12), scale=(2, 1, 1))
+    270, 0, -25), texture="./assets/textures/alexa_affichage.png", double_sided=True,  position=(16, 2.5, 12),texture_scale=(1,1), scale=(2, 1, 1))
 
 AlexaToolTip = Text("Appuie sur T pour discuter")
 AlexaToolTip.disable()
@@ -809,11 +836,11 @@ def degat():
                    scaleEnt=0.125,
                    colorEnt=color.yellow,
                    modelName="coin",
-                   coinValue=50)
+                   coinValue=randint(50,75))
     else:
-        pv_enemy_boss -= 1
+        pv_enemy_boss -= degatEpee
         barre_de_vie_enemy.scale = (
-            2.5-0.5*(abs(pv_enemy_boss-pv_enemy_boss_max)), 0.1, 0.1)
+            2.50*(pv_enemy_boss/pv_enemy_boss_max), 0.1, 0.1)
 
 
 delay = 1
@@ -836,8 +863,10 @@ def update():
     global boss_battle
     global coins
     global degat, delay, start
-    global pv_enemy_boss
-
+    global pv_enemy_boss, boss_win
+    
+        
+        
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
@@ -845,20 +874,18 @@ def update():
 
     if (boss_win):
         #la partie reprise de combat ca marche pas trop prblm pv boss + tp qiu se dep
-        tp_grotte_boss.collider = "box"
         tp_grotte_boss.visible = True
-        tp_grotte_boss.position = (enemy.position[0]+4,enemy.position[1],enemy.position[2] )
+        tp_grotte_boss.position = (510,1,500)
 
         if distance(tp_grotte_boss, player) < 2:
             player.position = (0,1,0)
             sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
             boss_battle = False
             enemy.visible = True
-            enemy.collider = "box"
             pv_enemy_boss = 15
             tp_grotte_boss.collider = None
             tp_grotte_boss.visible = None
-
+            player.rotation=(0,0,0)
     direction_x = player.x - enemy.x
     direction_z = player.z - enemy.z
     if enemy.hovered and distance(player, enemy) <= 9:
@@ -985,6 +1012,12 @@ def update():
             tp_grotte_boss.visible = None
             invoke(lambda: msg.animate('alpha', 0, duration=1), delay=2)
             boss_battle = True
+            boss_win = False
+            enemy.position = (510,3,500)
+            pv_enemy_boss=pv_enemy_boss_max
+            enemy.collision= True
+            enemy.visible = True
+            barre_de_vie_enemy.scale=(2.5,0.1,0.1)
             sky.texture = "./assets/textures/environement/chaos.jpg"
             player.position = (500, 2, 500)
 
