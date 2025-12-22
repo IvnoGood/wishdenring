@@ -134,7 +134,7 @@ barre_de_vie_enemy = Entity(parent=enemy,
                             position=(0, 3.85, 0),
                             scale=(2.5, 0.1, 0.1))
 
-
+#log les info dans l'inventaire
 inventaire = {
     0: {"model": "katana", "color": color.magenta},
     1: {},
