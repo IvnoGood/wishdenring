@@ -25,7 +25,7 @@ structure_grotte = {
 tp_grotte = {
     0: Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10, 10))
 }
-camera.clip_plane_far = 75
+camera.clip_plane_far = 120
 boss_room = {
     1: Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png', collider='box', position=(500, -0.5, 500), texture_scale=(60, 60))
 }
@@ -96,14 +96,14 @@ class Enemies(Entity):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
         super().__init__(position=Vec3(*position), **kwargs)
-        collision='box'
         # Create children using local coordinates and parent=self so moving this Entity moves them all
         self.sphere = Entity(
             parent=self,
             model='sphere',
             color=color.blue,
             position=Vec3(0, 0, 0),
-            scale=1
+            scale=1,
+            collider = 'box'
         )
 
         self.torso = Entity(
@@ -112,6 +112,8 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 1.25, 0),
             scale=Vec3(1, 2, 1),
+            collider = 'box'
+
         )
 
         self.head = Entity(
@@ -120,7 +122,10 @@ class Enemies(Entity):
             texture='shrek_face.jpg',
             position=Vec3(0, 2.75, 0),
             scale=Vec3(1, 1, 1),
+            collider = 'box'
+
         )
+
 
 
 enemy = Enemies()
@@ -148,7 +153,6 @@ inventaire = {
 }
 
 slot_actuel = 0
-
 
 class IventaireBas(Entity):
     def __init__(self):
@@ -205,7 +209,8 @@ class MoneyDisplay(Text):
 
 
 player = Character()
-player.position = (1,5,1)
+player.rotation = (0,35,0)
+player.position = (10,6,0)
 inv = IventaireBas()
 speedFact = 4
 degatEpee = 1
@@ -251,10 +256,7 @@ class HandItem(Entity):
 
                 elif (self.color == color.magenta):
                     degatEpee = 5
-                """ self.rotation_x = 90
-                time.sleep(0.25)
-                self.rotation_x = 0 """
-                # TODO: ajouter log pour frapper
+
 
         elif (self.modelName == "fiole"):
             if held_keys["right mouse"]:
@@ -332,8 +334,7 @@ player.cursor = Entity(parent=camera.ui, model='quad',
                        color=color.pink, scale=.008, rotation_z=45)
 
 checkpoints = {
-    0: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(0, 0.5, 0)),
-    1: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(3, 0.5, 3))
+    0: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(10, 0.5, 0)),
 }
 
 
@@ -389,7 +390,7 @@ print("took", end-start, "seconds to generate terrain")
 
  """
 # ------ END TERRAIN ------
-player.rotation_y = 180
+
 vitesse_chute = 0
 force_gravite = -1.5
 last_checkpoint = player.position
@@ -624,8 +625,9 @@ class GUIExitBtn(Button):
 
         def closeGui():
             global pause
-            player.position = Vec3(
-                player.position[0]+4, player.position[1], player.position[2]+2)
+            player.position = (10,2.5,0)
+                            #Vec3(
+                #player.position[0]+4, player.position[1], player.position[2]+2)
             pause = False
             mouse.locked = True
 
@@ -837,6 +839,7 @@ def degat():
                    colorEnt=color.yellow,
                    modelName="coin",
                    coinValue=randint(50,75))
+        enemy.position = (500,1000,900)
     else:
         pv_enemy_boss -= degatEpee
         barre_de_vie_enemy.scale = (
@@ -878,7 +881,7 @@ def update():
         tp_grotte_boss.position = (510,1,500)
 
         if distance(tp_grotte_boss, player) < 2:
-            player.position = (0,1,0)
+            player.position = (10,5,0)
             sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
             boss_battle = False
             enemy.visible = True
@@ -951,7 +954,7 @@ def update():
 
     if pause != True:
         old_y = player.y
-        vitesse_chute += force_gravite * 0.1
+        vitesse_chute += force_gravite * time.dt*3.8
         player.y += vitesse_chute * time.dt
 
         if player.intersects().hit:
@@ -965,11 +968,7 @@ def update():
         player.position = (last_checkpoint.x,
                            last_checkpoint.y + 2, last_checkpoint.z)
 
-    # saut possible que si le perso est sur une surface plate où il ne chute pas
-    if pause != True:
-        if held_keys['space'] and vitesse_chute == 0:
-            # met une vitesse de chute positive pour que le joueur "tombe" vers le haut puis il chute avec la
-            vitesse_chute = 6
+ 
         # gravité
     if player.y <= -15:
         player.position = (last_checkpoint.x,
@@ -1015,11 +1014,12 @@ def update():
             boss_win = False
             enemy.position = (510,3,500)
             pv_enemy_boss=pv_enemy_boss_max
-            enemy.collision= True
+            enemy.collider= True
             enemy.visible = True
             barre_de_vie_enemy.scale=(2.5,0.1,0.1)
             sky.texture = "./assets/textures/environement/chaos.jpg"
             player.position = (500, 2, 500)
+            player.rotation = (0,90,0)
 
     enemy_pos = (round(enemy.x), round(enemy.z))
     player_pos = (round(player.x), round(player.z))
