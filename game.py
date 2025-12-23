@@ -12,9 +12,10 @@ import argparse
 from collections import deque
 from time import time as tm
 from ursina.prefabs.health_bar import HealthBar
-#from ursina.shaders import lit_with_shadows_shader 
+from ursina.shaders import lit_with_shadows_shader, ssao_shader
 
-app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
+app = Ursina(icon="./assets/icons/app.ico",
+             title="WishDenRing")
 
 
 structure_grotte = {
@@ -23,9 +24,20 @@ structure_grotte = {
     2: Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 2, 23), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
 }
 tp_grotte = {
-    0: Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10, 10))
+    0: {"portal": Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10, 10)),
+        "mobNmb": 1,
+        "boss": Entity(),
+        "isSpe": False,
+        "sky": "./assets/textures/environement/chaos.jpg",
+        "tpPos": (500, 2, 500)
+        }
 }
+
+
 camera.clip_plane_far = 75
+
+camera.shader = ssao_shader
+
 boss_room = {
     1: Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png', collider='box', position=(500, -0.5, 500), texture_scale=(60, 60))
 }
@@ -39,21 +51,6 @@ class Character(Entity):
             position=(0, 3, 0),
             collider='sphere'
         )
-
-
-""" class Sword(Entity):
-    def __init__(self):
-        super().__init__(
-            model='cube',
-            color=color.red,
-            position=(0, 0, 0),
-            collider='box',
-            rotation=(0,45,45),
-            parent=camera.ui
-        ) 
-
-sword = Sword()
- """
 
 
 class Players(Entity):
@@ -208,7 +205,7 @@ class MoneyDisplay(Text):
 
 
 player = Character()
-player.position = (1,5,1)
+player.position = (1, 5, 1)
 inv = IventaireBas()
 speedFact = 4
 degatEpee = 1
@@ -224,7 +221,8 @@ class HandItem(Entity):
             position=(0.5, .5, 1),
             scale=0.25,
             color=entColor,
-            collider="mesh"
+            collider="mesh",
+            shader=lit_with_shadows_shader
         )
 
     def updItem(self, newVal):
@@ -315,52 +313,14 @@ platforme = Entity(model='cube', color=color.orange, scale=(
 
 
 # ------ TERRAIN ------
-#structSol = Entity(model='./assets/models/ile2.obj', scale=(1, 1,1), color=color.gray,collider='mesh', origin_y=0,shader=lit_with_shadows_shader)
+# structSol = Entity(model='./assets/models/ile2.obj', scale=(1, 1,1), color=color.gray,collider='mesh', origin_y=0,shader=lit_with_shadows_shader)
 
-sol = Entity(model="./assets/models/baseIle.obj", scale=(2, 1,2), texture='./assets/textures/bricks.png', collider='mesh', origin_y=0.5, texture_scale=(64, 64), double_sided=True)
-
-DirectionalLight(parent=scene, y=2, z=10, shadows=True, rotation=(45, -45, 45))
-""" noise = PerlinNoise(octaves=3, seed=0)
-amp = 2
-freq = 24
-width = 30
-
-
-# Source - https://stackoverflow.com/questions/70467860/need-help-in-perline-noise-ursina-to-make-an-a-plain-land
-# Posted by Jan Wilamowski
-# Retrieved 2025-12-06, License - CC BY-SA 4.0
-start = tm()
-sol = Entity(model=Mesh(vertices=[], uvs=[]),
-             color=color.white, texture='./assets/textures/grass.png', texture_scale=(1, 1))
-
-for x in range(1, width):
-    for z in range(1, width):
-        # add two triangles for each new point
-        y00 = noise([x/freq, z/freq]) * amp
-        y10 = noise([(x-1)/freq, z/freq]) * amp
-        y11 = noise([(x-1)/freq, (z-1)/freq]) * amp
-        y01 = noise([x/freq, (z-1)/freq]) * amp
-        sol.model.vertices += (
-            # first triangle
-            (x, y00, z),
-            (x-1, y10, z),
-            (x-1, y11, z-1),
-            # second triangle
-            (x, y00, z),
-            (x-1, y11, z-1),
-            (x, y01, z-1)
-        )
-
-sol.model.generate()
-sol.model.project_uvs()  # for texture
-sol.model.generate_normals()  # for lighting
-sol.collider = 'mesh'  # for collision
-
-end = tm()
-
-print("took", end-start, "seconds to generate terrain")
-
+""" sol = Entity(model="plane", scale=(16, 1, 16), color=color.gray,
+             collider='box', origin_y=0.5, texture_scale=(64, 64), double_sided=True, shader=lit_with_shadows_shader)
  """
+Entity(model='plane', scale=64,
+       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/bricks.png", texture_scale=(64, 64))
+
 # ------ END TERRAIN ------
 player.rotation_y = 180
 vitesse_chute = 0
@@ -512,11 +472,13 @@ camera.fov = 90
 camera.parent = player.camera_pivot   # <- essentiel pour FPS
 camera.position = Vec3(0, 0, 0)
 pause = False
-sky_image = load_texture("./assets/textures/environement/stars-at-night-sky.png")
+sky_path = "./assets/textures/environement/sunset.jpg"
+sky_image = load_texture(
+    sky_path)
 sky = Sky(color=color.white, texture=sky_image)
 boss_battle = False
 if boss_battle == False:
-    sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+    sky.texture = sky_path
 
 environementSounds = None
 coins = 0
@@ -524,44 +486,105 @@ coins = 0
 
 # ------ STRUCTURES ------
 
-ThomasHut = Entity(model="./assets/models/hut.obj",
-                   scale=(2.5, 2.5, 2.5), collider="mesh", position=(0, 0, 10), rotation=(0, 315, 0))
+light = DirectionalLight(shadows=True, position=Vec3(5, 5, -20))
+light_look_pos = Vec3(10., 0.5, 15)
+pointer = Entity(model="cube", position=light_look_pos,
+                 color=color.red, scale=1)
 
-ThomasNpc = Entity(model="./assets/models/npc.obj", scale=(1.125, 1.125,
-                                                           1.125), texture="./assets/textures/hero_baseColor.png", double_sided=True, position=Vec3(-0.61932373, 0, 13.616727), rotation=(0, 145, 0))
-ThomasNpcTag = Entity(model="plane", rotation=(
-    270, 0, 25), texture="./assets/textures/thomas_affichage.png", double_sided=True, position=Vec3(-0.61932373, 2.5, 13.616727), scale=(2, 1, 1))
+pointer = Entity(model="cube", position=light.position,
+                 color=color.red, scale=1)
+
+light.look_at(light_look_pos)
+
+
+light.shadow_resolution = 2048 * 20
+light.shadow_bias = 0.005
+(0.255, 0.125, 0.20)
+
+light.color = color.hex("#eae0c1")
+
+
+ThomasHut = Entity(
+    model="./assets/models/hyundai_porter.obj",
+    texture="./assets/textures/truck/h-porter-gray.jpg",
+    scale=0.1,
+    collider="box",
+    position=(-7, 0, 15),
+    rotation=(0, 315, 0),
+    double_sided=True,
+    shader=lit_with_shadows_shader
+)
+
+ThomasHut.cast_shadows = True
+ThomasHut.receive_shadows = True
+
+ThomasNpc = Entity(
+    model="./assets/models/npc.obj",
+    collider="box",
+    scale=(1.125, 1.125, 1.125),
+    texture="./assets/textures/hero_baseColor.png",
+    double_sided=True,
+    position=Vec3(-0.61932373, 0, 13.616727),
+    rotation=(0, 145, 0),
+    shader=lit_with_shadows_shader
+)
+
+
+ThomasNpc.cast_shadows = True
+ThomasNpc.receive_shadows = True
+
+ThomasNpcTag = Entity(
+    model="plane",
+    rotation=(270, 0, 25),
+    texture="./assets/textures/thomas_affichage.png",
+    double_sided=True,
+    position=Vec3(-0.61932373, 2.5, 13.616727),
+    scale=(2, 1, 1)
+)
 
 NpcThomasToolTip = Text("Appuie sur T pour discuter")
 NpcThomasToolTip.disable()
+coloor = (0.80, 0.80, 0.80, 1)
+darken = color.rgba(coloor[0], coloor[1], coloor[2], coloor[3])
+ThomasNpc.color = darken
+ThomasHut.color = darken
+ThomasNpcTag.color = darken
 
 
-AlexaHut = Entity(model="./assets/models/hut.obj",
-                  scale=(2.5, 2.5, 2.5), collider="mesh", position=(13, 0, 12), rotation=(0, -315, 0))
-
-AlexaNpc = Entity(model="./assets/models/MEDICAL_SISTER.obj", position=(16, 0, 12),
-                  collider="box", scale=0.01, ignore=True, origin_y=0, texture="./assets/textures/MEDICAL_SISTER_BaseColor.png", double_sided=True, rotation=(0, -145, 0))
-AlexaNpcTag = Entity(model="plane", rotation=(
-    270, 0, -25), texture="./assets/textures/alexa_affichage.png", double_sided=True,  position=(16, 2.5, 12), scale=(2, 1, 1))
-
+AlexaHut = Entity(
+    model="./assets/models/hut.obj",
+    scale=(2.5, 2.5, 2.5),
+    collider="mesh",
+    position=(13, 0, 12),
+    rotation=(0, -315, 0),
+    shader=lit_with_shadows_shader
+)
+AlexaNpc = Entity(
+    model="./assets/models/MEDICAL_SISTER.obj",
+    position=(16, 0, 12),
+    collider="mesh",
+    scale=0.01,
+    ignore=True,
+    origin_y=0,
+    texture="./assets/textures/MEDICAL_SISTER_BaseColor.png",
+    double_sided=True,
+    rotation=(0, -145, 0),
+    shader=lit_with_shadows_shader
+)
+AlexaNpcTag = Entity(
+    model="plane",
+    rotation=(270, 0, -25),
+    texture="./assets/textures/alexa_affichage.png",
+    double_sided=True,
+    position=(16, 2.5, 12),
+    scale=(2, 1, 1),
+)
 AlexaToolTip = Text("Appuie sur T pour discuter")
 AlexaToolTip.disable()
 
-
-""" class ThomasGUI(Entity):
-    def __init__(self):
-        super().__init__(
-            parent=camera.ui
-        )
-        self.gui = Entity(
-            parent=self,
-            model='quad',
-            scale=(1.5, 0.85),
-            origin=(0, -0.09),
-            position=(0, 0),
-            texture='./assets/textures/guiThomas.png',
-            enable=True)
-         """
+AlexaNpc.color = darken
+AlexaHut.color = darken
+AlexaNpcTag.color = darken
 
 
 class ShopButton(Button):
@@ -672,9 +695,12 @@ def displayForNpc(pause):
 
 # ------ STRUCTURES END ------
 
+# ------ NPC DISSCUSSION ------
+
+
+# ------ NPC DISSCUSSION END------
 
 # ------ NATURES ------
-
 # Flowers
 for i in range(0):
     max = 100
@@ -755,11 +781,13 @@ class DroppedItem(Entity):
                 for key in inventaire:
                     if ("color" not in inventaire[key] and "model" not in inventaire[key]):
                         print("slot: ", key, " is empty !")
-                        inventaire[key] = {"model": self.modelName, "color": self.color}
+                        inventaire[key] = {
+                            "model": self.modelName, "color": self.color}
                         found = True
                         self.picked_up = True
                         self.enabled = False
                         break
+
 
 """ 
 coin = DroppedItem(modelEnt="./assets/models/coin.obj",
@@ -773,27 +801,16 @@ erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      pos=(6, 0.5, 7),
                      scaleEnt=0.25,
                      colorEnt=color.red,
-                     modelName="fiole")
-
-erlenG = DroppedItem(modelEnt="./assets/models/fiole.obj",
-                     pos=(6, 1.5, 7),
-                     scaleEnt=0.25,
-                     colorEnt=color.green,
-                     modelName="fiole")
-
-erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
-                     pos=(6, 2.5, 7),
-                     scaleEnt=0.25,
-                     colorEnt=color.magenta,
                      modelName="fiole") """
 
 boss_win = False
-tp_grotte_boss = Entity(model='cube', 
-                scale=(2.5, 4, 2.5), 
-                position=(0,0,0), 
-                collider='box', texture='brick', color=color.black, texture_scale=(10, 10))
+tp_grotte_boss = Entity(model='cube',
+                        scale=(2.5, 4, 2.5),
+                        position=(0, 0, 0),
+                        collider='box', texture='brick', color=color.black, texture_scale=(10, 10))
 tp_grotte_boss.collider = None
 tp_grotte_boss.visible = None
+
 
 def degat():
     global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee, boss_win
@@ -805,11 +822,11 @@ def degat():
         boss_win = True
         location = enemy.position
         coin = DroppedItem(modelEnt="./assets/models/coin.obj",
-                   pos=location,
-                   scaleEnt=0.125,
-                   colorEnt=color.yellow,
-                   modelName="coin",
-                   coinValue=50)
+                           pos=location,
+                           scaleEnt=0.125,
+                           colorEnt=color.yellow,
+                           modelName="coin",
+                           coinValue=50)
     else:
         pv_enemy_boss -= 1
         barre_de_vie_enemy.scale = (
@@ -838,20 +855,24 @@ def update():
     global degat, delay, start
     global pv_enemy_boss
 
+    if (held_keys["l"]):
+        print(player.position)
+
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
             degat()
 
     if (boss_win):
-        #la partie reprise de combat ca marche pas trop prblm pv boss + tp qiu se dep
+        # la partie reprise de combat ca marche pas trop prblm pv boss + tp qiu se dep
         tp_grotte_boss.collider = "box"
         tp_grotte_boss.visible = True
-        tp_grotte_boss.position = (enemy.position[0]+4,enemy.position[1],enemy.position[2] )
+        tp_grotte_boss.position = (
+            enemy.position[0]+4, enemy.position[1], enemy.position[2])
 
         if distance(tp_grotte_boss, player) < 2:
-            player.position = (0,1,0)
-            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+            player.position = (0, 1, 0)
+            sky.texture = sky_path
             boss_battle = False
             enemy.visible = True
             enemy.collider = "box"
@@ -948,7 +969,7 @@ def update():
         player.position = (last_checkpoint.x,
                            last_checkpoint.y + 2, last_checkpoint.z)
         boss_battle = False
-        sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+        sky.texture = sky_path
 
     user_data[str(random_uuid)]['player']['location'] = tuple(player.position)
     user_data[str(random_uuid)]['player']['rotation'] = [
@@ -978,7 +999,7 @@ def update():
             pause_menu = False
 
     for i in tp_grotte:
-        if distance(player.position, tp_grotte[i].position) <= 2.5:
+        if distance(player.position, tp_grotte[i]["portal"].position) <= 2.5:
             print("Début combat de boss")
             msg.enable()
             tp_grotte_boss.collider = None
