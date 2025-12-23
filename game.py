@@ -30,6 +30,9 @@ boss_room = {
     1: Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png', collider='box', position=(500, -0.5, 500), texture_scale=(60, 60))
 }
 
+fontaine=Entity(model='/assets/textures/environement/fontaine.obj', scale=(0.85,0.85,0.85), position=(10,0.7,-10), collider='mesh', texture='brick', color=color.gray, texture_scale=(10, 10))
+eau=Entity(model='cube', scale=(8.75,0.35,8.75), position=(10,0.2,-10), collider='box', color=color.blue,)
+eau.rotation=(0,45,0)
 
 class Character(Entity):
     def __init__(self):
@@ -210,9 +213,9 @@ class MoneyDisplay(Text):
 
 player = Character()
 player.rotation = (0,35,0)
-player.position = (10,6,0)
+player.position = (10,10,0)
 inv = IventaireBas()
-speedFact = 4
+speedFact = 5
 degatEpee = 1
 start_epee = time.time()
 
@@ -243,7 +246,7 @@ class HandItem(Entity):
 
         if (self.modelName == "katana"):
             if held_keys["left mouse"]:            
-                if held_keys["left mouse"] and self.swinging == False:
+                if held_keys["left mouse"] and self.swinging == False and pause == False:
                     self.swing()
                 if (self.color == color.brown):
                     degatEpee = 2
@@ -276,7 +279,7 @@ class HandItem(Entity):
                 
     def swing(self):
         global start_epee
-        if time.time() - start_epee >= 1:
+        if time.time() - start_epee >= 1 and pause == False:
             start_epee = time.time()
             self.swinging = True
             print('swing')
@@ -285,8 +288,8 @@ class HandItem(Entity):
                 duration=0.5,
                 curve=curve.out_quad
             )
-
-            invoke(self.reset_rotation, delay=0.5)
+            if pause == False:
+                invoke(self.reset_rotation, delay=0.5)
 
     def reset_rotation(self):
         self.animate_rotation(
@@ -334,7 +337,7 @@ player.cursor = Entity(parent=camera.ui, model='quad',
                        color=color.pink, scale=.008, rotation_z=45)
 
 checkpoints = {
-    0: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(10, 0.5, 0)),
+    0: Entity(model='cube', color=color.green, scale=(1, 0.001, 1), position=(10, 0.002, 0)),
 }
 
 
@@ -547,8 +550,7 @@ if boss_battle == False:
     sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
 
 environementSounds = None
-coins = 0
-
+coins = 50
 
 # ------ STRUCTURES ------
 
@@ -815,7 +817,7 @@ erlenP = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      scaleEnt=0.25,
                      colorEnt=color.magenta,
                      modelName="fiole") """
-
+boss_dmg=25
 boss_win = False
 tp_grotte_boss = Entity(model='cube', 
                 scale=(2.5, 4, 2.5), 
@@ -825,21 +827,32 @@ tp_grotte_boss.collider = None
 tp_grotte_boss.visible = None
 
 def degat():
-    global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee, boss_win
+    global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee, boss_win,boss_dmg
     # print("Point 3D sous la souris :", mouse.world_point)
     calc = pv_enemy_boss - degatEpee
     if (calc <= 0):
+        pv_enemy_boss -= degatEpee
+        barre_de_vie_enemy.scale = (
+            2.50*(pv_enemy_boss/pv_enemy_boss_max), 0.1, 0.1)
+
+#        enemy.visible = False
         enemy.visible = False
         enemy.collider = None
-        boss_win = True
         location = enemy.position
+        enemy.position = Vec3(500,-1000,900)
+        boss_battle = False
+        boss_dmg=0
+
+        boss_win = True
         coin = DroppedItem(modelEnt="./assets/models/coin.obj",
                    pos=location,
                    scaleEnt=0.125,
                    colorEnt=color.yellow,
                    modelName="coin",
                    coinValue=randint(50,75))
-        enemy.position = (500,1000,900)
+        tp_grotte_boss.visible = True
+        tp_grotte_boss.collider = 'box'
+        tp_grotte_boss.position = Vec3(520,1,500)
     else:
         pv_enemy_boss -= degatEpee
         barre_de_vie_enemy.scale = (
@@ -849,6 +862,10 @@ def degat():
 delay = 1
 start = time.time()
 
+death = False
+dash_cooldown=time.time()
+boss_attacking = False
+boss_timer = time.time()
 
 def update():
     global vitesse_chute, speedFact
@@ -866,29 +883,92 @@ def update():
     global boss_battle
     global coins
     global degat, delay, start
-    global pv_enemy_boss, boss_win
+    global pv_enemy_boss, boss_win,health_bar_1
+    global death,dash_cooldown,boss_attacking,boss_timer,boss_dmg
+
     
-        
-        
+    if held_keys['q'] and time.time()-dash_cooldown >= 1.5 and pause == False :
+        print('dash')
+        dash_distance = 7
+        if held_keys['a']:
+            direction = -Vec3(camera.right.x, 0, camera.right.z).normalized()
+        elif held_keys['d']:
+            direction = Vec3(camera.right.x, 0, camera.right.z).normalized()
+        elif held_keys['s']:
+            direction = -Vec3(camera.forward.x, 0, camera.forward.z).normalized()
+        else:
+            direction = Vec3(camera.forward.x, 0, camera.forward.z).normalized()
+        hit = raycast(
+            player.world_position,
+            direction,
+            distance=dash_distance,
+            ignore=(player,)
+        )
+
+        if hit.hit:
+            target_pos = hit.world_point - direction * 0.6
+        else:
+            target_pos = player.world_position + direction * dash_distance
+  
+        player.animate(
+            'position',
+            target_pos,
+            duration=0.35,
+            curve=curve.out_quad
+        )
+        dash_cooldown=time.time()
+
+    if distance (fontaine,player)<= 6:
+        health_bar_1.value=100
+    if pause == False:
+        if distance(enemy,player) <= 6: 
+
+            if  boss_attacking == False:
+                boss_attacking = True
+                boss_timer = time.time()
+
+            elif time.time() - boss_timer >= 1.65:
+                print("hit")
+                health_bar_1.value -= boss_dmg
+                boss_timer = time.time()
+        else:
+            if boss_attacking== True and time.time() - boss_timer >= 2:
+                boss_attacking = False
+
+        if health_bar_1.value <= 0:
+            death = True
+            coins = 0
+    
+    if death == True:
+        player.position = (last_checkpoint.x,last_checkpoint.y+5,last_checkpoint.z)
+        player.rotation = (0,0,0)
+        health_bar_1.value = 100
+        boss_battle = False
+        sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+        death = False
+            
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
             degat()
-
-    if (boss_win):
+    if boss_win == False:
+        tp_grotte_boss.position = (520,100,500)
+    if boss_win == True:
         #la partie reprise de combat ca marche pas trop prblm pv boss + tp qiu se dep
         tp_grotte_boss.visible = True
-        tp_grotte_boss.position = (510,1,500)
+        tp_grotte_boss.position = (520,1,500)
 
         if distance(tp_grotte_boss, player) < 2:
             player.position = (10,5,0)
-            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
             boss_battle = False
             enemy.visible = True
             pv_enemy_boss = 15
             tp_grotte_boss.collider = None
             tp_grotte_boss.visible = None
             player.rotation=(0,0,0)
+            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+            
+            
     direction_x = player.x - enemy.x
     direction_z = player.z - enemy.z
     if enemy.hovered and distance(player, enemy) <= 9:
@@ -1012,14 +1092,16 @@ def update():
             invoke(lambda: msg.animate('alpha', 0, duration=1), delay=2)
             boss_battle = True
             boss_win = False
+            sky.texture = "./assets/textures/environement/chaos.jpg"
             enemy.position = (510,3,500)
             pv_enemy_boss=pv_enemy_boss_max
             enemy.collider= True
             enemy.visible = True
             barre_de_vie_enemy.scale=(2.5,0.1,0.1)
-            sky.texture = "./assets/textures/environement/chaos.jpg"
             player.position = (500, 2, 500)
             player.rotation = (0,90,0)
+            boss_dmg=25
+
 
     enemy_pos = (round(enemy.x), round(enemy.z))
     player_pos = (round(player.x), round(player.z))
@@ -1054,6 +1136,5 @@ def update():
         moveClouds()
         pause = displayForNpc(pause)
         controlHotbar()
-
 
 app.run()
