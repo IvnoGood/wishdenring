@@ -813,12 +813,17 @@ def degat():
 delay = 1
 start = time.time()
 
+<<<<<<< Updated upstream
 death = False
 dash_cooldown = time.time()
 boss_attacking = False
 boss_timer = time.time()
 
 
+=======
+clé_jump = False
+clé_lab = False
+>>>>>>> Stashed changes
 def update():
     global vitesse_chute, speedFact
     global last_checkpoint
@@ -835,6 +840,7 @@ def update():
     global boss_battle
     global coins
     global degat, delay, start
+<<<<<<< Updated upstream
     global pv_enemy_boss, boss_win,health_bar_1
     global death,dash_cooldown,boss_attacking,boss_timer,boss_dmg
 
@@ -902,6 +908,13 @@ def update():
         sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
         death = False
             
+=======
+    global pv_enemy_boss
+    global jump
+    global clé_jump
+    global clé_lab
+    global lave_jump
+>>>>>>> Stashed changes
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
@@ -980,6 +993,104 @@ def update():
         if held_keys['d']:
             move += Vec3(camera.right.x, 0,
                          camera.right.z).normalized() * vitesse
+    portail.look_at(player)
+    portail.rotation_y = portail.rotation_y + 180
+    portail.rotation_x = 0
+    portail.rotation_z = 0
+    if player.intersects(portail):
+        player.position = (1000, 986, 1000)
+    
+    portail2.look_at(player)
+    portail2.rotation_y = portail2.rotation_y + 180
+    portail2.rotation_x = 0
+    portail2.rotation_z = 0
+    if player.intersects(portail2):
+        player.position = (0, 0, 0)
+        
+    portail3.look_at(player)
+    portail3.rotation_y = portail3.rotation_y + 180
+    portail3.rotation_x = 0
+    portail3.rotation_z = 0
+
+    portail4.look_at(player)
+    portail4.rotation_y = portail4.rotation_y + 180
+    portail4.rotation_x = 0
+    portail4.rotation_z = 0
+    if player.intersects(portail4):
+        player.position = (3000, 1001.5, 3001.7)
+        jump = True
+        if player.intersects(lave_jump):
+            player.position = (0, 0, 0)
+            jump = False
+   
+
+    portail5.look_at(player)
+    portail5.rotation_y = portail5.rotation_y + 180
+    portail5.rotation_x = 0
+    portail5.rotation_z = 0
+
+    portail6.look_at(player)
+    portail6.rotation_y = portail6.rotation_y + 180
+    portail6.rotation_x = 0
+    portail6.rotation_z = 0
+    if player.intersects(portail6):
+        #player.position = (1904.5, 1005, 2095.5)
+        player.position = (2056, 1002, 1938)
+
+    portail7.look_at(player)
+    portail7.rotation_y = portail7.rotation_y + 180
+    portail7.rotation_x = 0
+    portail7.rotation_z = 0
+
+    portail8.look_at(player)
+    portail8.rotation_y = portail8.rotation_y + 180
+    portail8.rotation_x = 0
+    portail8.rotation_z = 0
+
+    portail9.look_at(player)
+    portail9.rotation_y = portail9.rotation_y + 180
+    portail9.rotation_x = 0
+    portail9.rotation_z = 0
+    
+    portaillab.look_at(player)
+    portaillab.rotation_y = portaillab.rotation_y + 180
+    portaillab.rotation_x = 0
+    portaillab.rotation_z = 0
+    if player.intersects(portaillab):
+        player.position = (1000, 986, 1000)
+
+    portailjump.look_at(player)
+    portailjump.rotation_y = portailjump.rotation_y + 180
+    portailjump.rotation_x = 0
+    portailjump.rotation_z = 0
+    if player.intersects(portailjump):
+        player.position = (1000, 986, 1000)
+        jump = False
+    if player.intersects(lave_jump):
+        player.position = (0, 0, 0)
+        jump = False
+    if jump == True:
+        lave_jump.y += 0.25 * time.dt
+    if jump == False:
+        lave_jump.position = (3000, 980, 3000)
+    
+    
+    
+    
+    
+    if clé_jump.hovered and distance(player, clé_jump) <= 9:
+        clé_jump.color = color.orange
+    else:
+        clé_jump.color = color.yellow
+    if clé_lab.hovered  and distance(player, clé_lab) <= 9:
+        clé_lab.color = color.orange
+    else:
+        clé_lab.color = color.yellow
+    
+    grille_portail5.look_at(player)
+    grille_portail5.rotation_y += 90
+    grille_portail5.rotation_x = 0
+    grille_portail5.rotation_z = 0
 
     # collisions X
     old_x = player.x
@@ -1095,6 +1206,210 @@ def update():
         moveClouds()
         pause = displayForNpc(pause)
         controlHotbar()
+clé_jumpe = False
+clé_labe = False
+def input(key):
+    global clé_jump
+    global clé_lab
+    global clé_jumpe
+    global clé_labe
+    if key == 'left mouse down':
+        print("Point 3D sous la souris :", mouse.world_point)
+    if key == 'left mouse down' and clé_lab.hovered and distance(player, clé_lab) <= 9:
+        clé_lab.visible = False
+        clé_lab.collider = None
+        clé_labe = True
+    if key == 'left mouse down' and clé_jump.hovered and distance(player, clé_jump) <= 9:
+        clé_jump.visible = False
+        clé_jump.collider = None
+        clé_jumpe = True
 
+portail = SpriteSheetAnimation(    # portail du lobby
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                     
+    animations={'pouet': ((0,0), (2,1))})
+
+portail.play_animation('pouet')
+portail.position = (-10, 3, 10)
+portail.scale = (8, 8)
+portail.collider = 'mesh'
+
+portail2 = SpriteSheetAnimation(     # portail pour aller au lobby
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet2': ((0,0), (2,1)) })
+portail2.play_animation('pouet2')
+portail2.position = (1012, 989, 1009.23)
+portail2.scale = (8, 8)
+portail2.collider = 'mesh'
+
+portail3 = SpriteSheetAnimation(   # portail du premier boss
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail3.play_animation('pouet3')
+portail3.position = (1015.7, 989, 998.2)
+portail3.scale = (8, 8)
+portail3.collider = 'mesh'
+portail3.color = color.magenta
+
+portail4 = SpriteSheetAnimation(   # portail du jump avec lave
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet4': ((0,0), (2,1)) })
+portail4.play_animation('pouet4')
+portail4.position = (1008.6, 989, 986.78)
+portail4.scale = (8, 8)
+portail4.collider = 'mesh'
+portail4.color = color.orange
+
+portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail5.play_animation('pouet3')
+portail5.position = (996.2, 989, 984.7)
+portail5.scale = (8, 8)
+portail5.collider = 'mesh'
+portail5.color = color.yellow
+
+portail6 = SpriteSheetAnimation(   # portail labyrinthe
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail6.play_animation('pouet3')
+portail6.position = (987, 989, 991.4)
+portail6.scale = (8, 8)
+portail6.collider = 'mesh'
+portail6.color = color.blue
+
+portail7 = SpriteSheetAnimation(   # portail prof de NSI
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail7.play_animation('pouet3')
+portail7.position = (984.5, 989, 1003.6)
+portail7.scale = (8, 8)
+portail7.collider = 'mesh'
+portail7.color = color.pink
+
+
+portail8 = SpriteSheetAnimation(   # portail dimension vide
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail8.play_animation('pouet3')
+portail8.position = (991.87, 989, 1013)
+portail8.scale = (8, 8)
+portail8.collider = 'mesh'
+portail8.color = color.azure
+
+portail9 = SpriteSheetAnimation(   # portail boss final
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portail9.play_animation('pouet3')
+portail9.position = (1002, 989, 1015.7)
+portail9.scale = (8, 8)
+portail9.collider = 'mesh'
+portail9.color = color.red
+
+portaillab = SpriteSheetAnimation(   # portail du labyrinthe
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portaillab.play_animation('pouet3')
+portaillab.position = (2057.5, 1002.5, 1939)
+portaillab.scale = (5.5, 5.5)
+portaillab.collider = 'mesh'
+portaillab.color = color.blue 
+
+portailjump = SpriteSheetAnimation(   # portail du labyrinthe
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                 
+    animations={'pouet3': ((0,0), (2,1)) })
+portailjump.play_animation('pouet3')
+portailjump.position = (2985.72, 1037, 3035.53)
+portailjump.scale = (5, 5)
+portailjump.collider = 'mesh'
+portailjump.color = color.orange
+
+dome_fermé = Entity(position = (1000, 1000, 1000),
+                    model = 'domeferme.obj',
+                    collider = 'mesh',
+                    rotation = (0, 0, 0),
+                    scale = (17, 17, 17),
+                    texture =  'brick',
+                    color = color.white,
+                    texture_scale = (10, 10))
+sol_dome = Entity(position = (1000, 984.8989, 1000),
+                  model = 'plane', 
+                  scale = (50, 50, 50),
+                  color = color.white,
+                  texture = 'brick',
+                  texture_scale = (10, 10),
+                  collider = 'mesh')
+labyrinthe = Entity(model = 'labyrinthe.obj',
+                    position = (2000, 1000, 2000),
+                    scale = (100, 100, 100),
+                    texture = 'brick', 
+                    collider = 'mesh',
+                    texture_scale = (100, 100))
+sol_labyrinthe = Entity(model = 'plane' ,                     # car défaut de modèle
+               position = (2050, 999.9, 1940),
+               scale = (30, 30, 30),
+               texture = 'brick',
+               collider = 'mesh',
+               texture_scale = (5, 5))
+                   
+         
+clé_lab = Entity(model = 'clé.obj',
+                 position = (2057.5, 1001, 1941), 
+                 color = color.yellow, 
+                 scale = (2,2,2),
+                 collider = 'mesh',
+                 rotation_x = 90)
+
+jump = Entity(model = 'jump.obj',
+              position = (3000, 1000, 3000),
+              texture = 'brick',
+              scale = (1, 1, 1),
+              collider = 'mesh',
+              texture_scale = (15,15))
+fin_jump = Entity(model = 'cube',
+                  position= (2985.72, 1033, 3035.53),
+                  scale = (7, 1, 7),
+                  collider = 'mesh',
+                  texture_scale = (15, 15),
+                  texture = 'brick')
+clé_jump = Entity(model = 'clé.obj',
+                  position = (2987, 1036.5, 3035.53),
+                  scale = (1, 1, 1),
+                  color = color.yellow,
+                  rotation_x = 90,
+                  rotation_y = 90)
+lave_jump = Entity(model = 'plane',
+                   position = (3000, 980, 3000),
+                   texture = 'lave.png',
+                   scale = (1000, 1000, 1000),
+                   texture_scale = (500, 500), 
+                   collider = 'mesh')
+
+grille_portail5 = Entity(model = 'grille.obj',
+                         color = color.gray,
+                         position = (995.8, 986, 986),
+                         rotation = portail5.rotation,
+                         scale = (0.16, 0.16, 0.16),)
 
 app.run()

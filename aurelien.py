@@ -28,7 +28,10 @@ def update():
     ennemi.look_at(ennemi.position + (direction_x, 0, direction_z))
     if player.x > 23 and player.z < 4.64 and player.z > -6:
         player.position = (10, 10, 10)
-
+    portal.look_at(player)
+    portal.rotation_y += 180
+    portal.rotation_x = 0
+    portal.rotation_z = 0
 
 pv_ennemi = 5
 
@@ -63,6 +66,7 @@ def input(key):
 
 
 app = Ursina()
+mouse.locked = True  
 
 entité1 = Entity(model='cube',
                  color=color.red,
@@ -120,5 +124,16 @@ bare_de_vie_ennemi = Entity(parent=ennemi,
                             position=(0, 0.7, 0),
                             scale=(2.5, 0.1, 0.1))
 
+portal = SpriteSheetAnimation(
+    texture='Dimensional_Portal.png', 
+    tileset_size=(3, 2),       
+    fps=8,                     # vitesse de l'animation
+    animations={'pouet': ((0,0), (2,1)) },# premier frame a dernire
+    scale = (20, 40)
+)
+portal.play_animation('pouet')
+portal.position = (0, 3, 0)
+portal.rotation = (0, 0, 0)
 
 app.run()
+
