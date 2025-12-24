@@ -30,6 +30,7 @@ wss.on("connection", function connection(ws) {
       });
       if (!hasfound) {
         //when 1st time connecting
+        console.log("New player is connecting !");
         let newArray = [...playersData, received];
         playersData = newArray;
         ws.send(
