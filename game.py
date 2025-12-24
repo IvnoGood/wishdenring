@@ -36,7 +36,6 @@ tp_grotte = {
 
 camera.clip_plane_far = 75
 
-camera.shader = ssao_shader
 
 boss_room = {
     1: Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png', collider='box', position=(500, -0.5, 500), texture_scale=(60, 60))
@@ -813,17 +812,14 @@ def degat():
 delay = 1
 start = time.time()
 
-<<<<<<< Updated upstream
 death = False
 dash_cooldown = time.time()
 boss_attacking = False
 boss_timer = time.time()
 
 
-=======
 clé_jump = False
 clé_lab = False
->>>>>>> Stashed changes
 def update():
     global vitesse_chute, speedFact
     global last_checkpoint
@@ -840,9 +836,13 @@ def update():
     global boss_battle
     global coins
     global degat, delay, start
-<<<<<<< Updated upstream
     global pv_enemy_boss, boss_win,health_bar_1
     global death,dash_cooldown,boss_attacking,boss_timer,boss_dmg
+    global pv_enemy_boss
+    global jump
+    global clé_jump
+    global clé_lab
+    global lave_jump
 
     if (held_keys["l"]):
         print(player.position)
@@ -908,13 +908,6 @@ def update():
         sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
         death = False
             
-=======
-    global pv_enemy_boss
-    global jump
-    global clé_jump
-    global clé_lab
-    global lave_jump
->>>>>>> Stashed changes
     if held_keys['left mouse'] and distance(player, enemy) <= 9:
         if time.time() - start >= delay:
             start = time.time()
@@ -1346,7 +1339,7 @@ portailjump.collider = 'mesh'
 portailjump.color = color.orange
 
 dome_fermé = Entity(position = (1000, 1000, 1000),
-                    model = 'domeferme.obj',
+                    model = './assets/models/domeferme.obj',
                     collider = 'mesh',
                     rotation = (0, 0, 0),
                     scale = (17, 17, 17),
@@ -1360,7 +1353,7 @@ sol_dome = Entity(position = (1000, 984.8989, 1000),
                   texture = 'brick',
                   texture_scale = (10, 10),
                   collider = 'mesh')
-labyrinthe = Entity(model = 'labyrinthe.obj',
+labyrinthe = Entity(model = './assets/models/labyrinthe.obj',
                     position = (2000, 1000, 2000),
                     scale = (100, 100, 100),
                     texture = 'brick', 
@@ -1374,14 +1367,14 @@ sol_labyrinthe = Entity(model = 'plane' ,                     # car défaut de m
                texture_scale = (5, 5))
                    
          
-clé_lab = Entity(model = 'clé.obj',
+clé_lab = Entity(model = './assets/models/clé.obj',
                  position = (2057.5, 1001, 1941), 
                  color = color.yellow, 
                  scale = (2,2,2),
                  collider = 'mesh',
                  rotation_x = 90)
 
-jump = Entity(model = 'jump.obj',
+jump = Entity(model = './assets/models/jump.obj',
               position = (3000, 1000, 3000),
               texture = 'brick',
               scale = (1, 1, 1),
@@ -1401,12 +1394,12 @@ clé_jump = Entity(model = 'clé.obj',
                   rotation_y = 90)
 lave_jump = Entity(model = 'plane',
                    position = (3000, 980, 3000),
-                   texture = 'lave.png',
+                   texture = './assets/textures/lave.png',
                    scale = (1000, 1000, 1000),
                    texture_scale = (500, 500), 
                    collider = 'mesh')
 
-grille_portail5 = Entity(model = 'grille.obj',
+grille_portail5 = Entity(model = './assets/models/grille.obj',
                          color = color.gray,
                          position = (995.8, 986, 986),
                          rotation = portail5.rotation,
