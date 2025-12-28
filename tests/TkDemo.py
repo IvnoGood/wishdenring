@@ -2,28 +2,64 @@
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from tkinter import *
-from PIL import Image, ImageTk
 
 
 def setup_demo(master):
 
-    ZEN = """test"""
+    ZEN = """Beautiful is better than ugly. 
+Explicit is better than implicit. 
+Simple is better than complex. 
+Complex is better than complicated.
+Flat is better than nested. 
+Sparse is better than dense.  
+Readability counts.
+Special cases aren't special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!"""
 
     root = ttk.Frame(master, padding=10)
     style = ttk.Style()
-    style.theme_use("solar")
     theme_names = style.theme_names()
 
     theme_selection = ttk.Frame(root, padding=(10, 10, 10, 0))
     theme_selection.pack(fill=X, expand=YES)
+
     theme_selected = ttk.Label(
         master=theme_selection,
-        text="WishDenRing",
+        text="litera",
         font="-size 24 -weight bold"
     )
     theme_selected.pack(side=LEFT)
+
+    lbl = ttk.Label(theme_selection, text="Select a theme:")
+    theme_cbo = ttk.Combobox(
+        master=theme_selection,
+        text=style.theme.name,
+        values=theme_names,
+    )
+    theme_cbo.pack(padx=10, side=RIGHT)
+    theme_cbo.current(theme_names.index(style.theme.name))
+    lbl.pack(side=RIGHT)
+
     ttk.Separator(root).pack(fill=X, pady=10, padx=10)
+
+    def change_theme(e):
+        t = cbo.get()
+        style.theme_use(t)
+        theme_selected.configure(text=t)
+        theme_cbo.selection_clear()
+        default.focus_set()
+
+    theme_cbo.bind('<<ComboboxSelected>>', change_theme)
 
     lframe = ttk.Frame(root, padding=5)
     lframe.pack(side=LEFT, fill=BOTH, expand=YES)
@@ -33,18 +69,43 @@ def setup_demo(master):
 
     color_group = ttk.Labelframe(
         master=lframe,
-        text="Options de configurations",
+        text="Theme color options",
         padding=10
     )
     color_group.pack(fill=X, side=TOP)
 
-    # Icons: warning, icon, error, question, info
-    img = ImageTk.PhotoImage(Image.open("./group.ico"))
-
     for color in style.colors:
-        cb = ttk.Button(color_group, text=color,
-                        bootstyle=color, image=img)
+        cb = ttk.Button(color_group, text=color, bootstyle=color)
         cb.pack(side=LEFT, expand=YES, padx=5, fill=X)
+
+    rb_group = ttk.Labelframe(
+        lframe, text="Checkbuttons & radiobuttons", padding=10)
+    rb_group.pack(fill=X, pady=10, side=TOP)
+
+    check1 = ttk.Checkbutton(rb_group, text="selected")
+    check1.pack(side=LEFT, expand=YES, padx=5)
+    check1.invoke()
+
+    check2 = ttk.Checkbutton(rb_group, text="deselected")
+    check2.pack(side=LEFT, expand=YES, padx=5)
+
+    check3 = ttk.Checkbutton(rb_group, text="disabled", state=DISABLED)
+    check3.pack(side=LEFT, expand=YES, padx=5)
+
+    radio1 = ttk.Radiobutton(rb_group, text="selected", value=1)
+    radio1.pack(side=LEFT, expand=YES, padx=5)
+    radio1.invoke()
+
+    radio2 = ttk.Radiobutton(rb_group, text="deselected", value=2)
+    radio2.pack(side=LEFT, expand=YES, padx=5)
+
+    radio3 = ttk.Radiobutton(
+        master=rb_group,
+        text="disabled",
+        value=3,
+        state=DISABLED
+    )
+    radio3.pack(side=LEFT, expand=YES, padx=5)
 
     ttframe = ttk.Frame(lframe)
     ttframe.pack(pady=5, fill=X, side=TOP)
@@ -286,7 +347,6 @@ def setup_demo(master):
 if __name__ == '__main__':
 
     app = ttk.Window("ttkbootstrap widget demo")
-    app.resizable(width=False, height=False)
 
     bagel = setup_demo(app)
     bagel.pack(fill=BOTH, expand=YES)

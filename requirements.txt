@@ -2,4 +2,4 @@ ursina
 requests
 websockets
 numpy
-perlin-noise
+ttkbootstrap

@@ -17,6 +17,21 @@ from ursina.shaders import lit_with_shadows_shader
 app = Ursina(icon="./assets/icons/app.ico",
              title="WishDenRing")
 
+parser = argparse.ArgumentParser(description='WishDenring config files')
+parser.add_argument('-c', '--config', type=str,
+                    help='Adds a config file')
+parser.add_argument('-m', '--multiplayer', type=str,
+                    help='Activate multiplayer mode')
+parser.add_argument('-ip', '--ipaddr', type=str,
+                    help='Specify ip address and port as parameter (default: ws://localhost:8080)')
+args = parser.parse_args()
+
+config = {"user": {"sensi": 40, "renderDistance": 75}}
+
+if (args.config):
+    with open(args.config, "r") as f:
+        jsonData = json.load(f)
+        config = jsonData
 
 structure_grotte = {
     0: Entity(model='cube', scale=(5, 5, 5), position=(10, 2, 20), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
@@ -34,7 +49,7 @@ tp_grotte = {
 }
 
 
-camera.clip_plane_far = 75
+camera.clip_plane_far = config["user"]["renderDistance"]
 
 
 boss_room = {
@@ -367,7 +382,8 @@ vitesse_chute = 0
 force_gravite = -1.5
 last_checkpoint = player.position
 
-player.mouse_sensitivity = Vec2(40, 40)
+player.mouse_sensitivity = Vec2(
+    config["user"]["sensi"], config["user"]["sensi"])
 player.camera_pivot = Entity(parent=player, y=player.height)
 # camera.shader = ssao_shader  # ! c'est juste moche
 mouse.locked = True
@@ -397,13 +413,6 @@ connected_users = []
 connected_user_entities = {}
 counter = 0
 PlayersMoving = {}
-
-parser = argparse.ArgumentParser(description='WishDenring config files')
-parser.add_argument('-m', '--multiplayer', action='store_true',
-                    help='Activate multiplayer mode')
-parser.add_argument('-ip', '--ipaddr', type=str,
-                    help='Specify ip address and port as parameter (default: ws://localhost:8080)')
-args = parser.parse_args()
 
 if args.ipaddr:
     uri = args.ipaddr
@@ -1025,14 +1034,14 @@ def update():
 
         if distance(tp_grotte_boss, player) < 2:
             player.position = (0, 1, 0)
-            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+            sky.texture = sky_path
             boss_battle = False
             enemy.visible = True
             pv_enemy_boss = 15
             tp_grotte_boss.collider = None
             tp_grotte_boss.visible = None
             player.rotation = (0, 0, 0)
-            sky.texture = "./assets/textures/environement/stars-at-night-sky.png"
+            sky.texture = sky_path
 
     direction_x = player.x - enemy.x
     direction_z = player.z - enemy.z
