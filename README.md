@@ -1,8 +1,7 @@
 # WishDenRing
 
-===
 
-<img src="./assets/icons/eldenwish.png" alt="Logo WishDenRing" width="100%" align="right">
+<img src="./assets/icons/eldenwish.png" alt="Logo WishDenRing" width="200" align="right">
 
 <h3>Un Dungeon Crawler 3D sous Python</h3>
 <p>
@@ -20,7 +19,6 @@
   <img src="./assets/textures/gameThumbnail.png" alt="Gameplay Screenshot" width="80%">
 </div>
 
-===
 
 ## 💻 Compatibilité
 
@@ -59,7 +57,6 @@ Executer le projet a travers le launcher
 python main.py
 ```
 
-===
 
 ## Arguments de lancement pour le jeu
 
@@ -71,7 +68,6 @@ python game.py --config configFile.json --multiplayer host/client --ipaddress ws
 `--multiplayer`: definis le mode de connection pour le mode multijoueur host pour créer le serveur ou client pour s'y connecter `<br/>`
 `--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host `<br/>`
 
-===
 
 ## Fichier de configuration
 
