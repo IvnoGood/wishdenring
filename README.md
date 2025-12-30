@@ -20,13 +20,13 @@
 </div>
 
 
-## 💻 Compatibilité
+# 💻 Compatibilité
 
 * [X] Windows
 * [X] Linux (Ubuntu, Arch, etc.)
 * [ ] MacOS
 
-## Préparation au lancement
+# Préparation au lancement
 
 Création de l'environnement virtuel python pour pouvoir installer toutes les dépendances nécéssaires
 
@@ -58,7 +58,7 @@ python main.py
 ```
 
 
-## Arguments de lancement pour le jeu
+# Arguments de lancement pour le jeu
 
 ```bash
 python game.py --config configFile.json --multiplayer host/client --ipaddress ws://localhost:3030
@@ -69,7 +69,7 @@ python game.py --config configFile.json --multiplayer host/client --ipaddress ws
 `--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host `<br/>`
 
 
-## Fichier de configuration
+# Fichier de configuration
 
 ```json
 {
