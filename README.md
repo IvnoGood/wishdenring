@@ -1,7 +1,6 @@
 # WishDenRing
 
-
-<img src="./assets/icons/eldenwish.png" alt="Logo WishDenRing" width="200" align="right">
+<img src="./assets/icons/eldenwish.png" alt="Logo WishDenRing" width="400" align="right">
 
 <h3>Un Dungeon Crawler 3D sous Python</h3>
 <p>
@@ -12,13 +11,11 @@
   à travers les niveaux.
 </p>
 
-
 <br>
 
 <div align="center">
   <img src="./assets/textures/gameThumbnail.png" alt="Gameplay Screenshot" width="80%">
 </div>
-
 
 # 💻 Compatibilité
 
@@ -30,7 +27,7 @@
 
 Création de l'environnement virtuel python pour pouvoir installer toutes les dépendances nécéssaires
 
-```bash
+```powershell
 python -m venv .venv
 ```
 
@@ -41,33 +38,31 @@ Activer l'environnement virtuel python. Méthode qui peut varier selon le systè
   source ./.venv/bin/activate
   ```
 * Windows:
-  ```bash
-   ./.venv/Scripts/Activate.ps1
+  ```powershell
+  ./.venv/Scripts/Activate.ps1
   ```
 
 Installer toutes les dépendances nécésaires a tout le projet
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
 Executer le projet a travers le launcher
 
-```bash
+```powershell
 python main.py
 ```
 
-
 # Arguments de lancement pour le jeu
 
-```bash
+```powershell
 python game.py --config configFile.json --multiplayer host/client --ipaddress ws://localhost:3030
 ```
 
-`--config`: prend en paramètre le fichier de configuration pour le jeu <br/>
-`--multiplayer`: definis le mode de connection pour le mode multijoueur host pour créer le serveur ou client pour s'y connecter <br/>
-`--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host <br/>
-
+`--config`: prend en paramètre le fichier de configuration pour le jeu `<br/>`
+`--multiplayer`: definis le mode de connection pour le mode multijoueur host pour créer le serveur ou client pour s'y connecter `<br/>`
+`--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host `<br/>`
 
 # Fichier de configuration
 
