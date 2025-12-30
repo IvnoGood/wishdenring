@@ -64,9 +64,9 @@ python main.py
 python game.py --config configFile.json --multiplayer host/client --ipaddress ws://localhost:3030
 ```
 
-`--config`: prend en paramètre le fichier de configuration pour le jeu `<br/>`
-`--multiplayer`: definis le mode de connection pour le mode multijoueur host pour créer le serveur ou client pour s'y connecter `<br/>`
-`--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host `<br/>`
+`--config`: prend en paramètre le fichier de configuration pour le jeu <br/>
+`--multiplayer`: definis le mode de connection pour le mode multijoueur host pour créer le serveur ou client pour s'y connecter <br/>
+`--ipaddress`: définis l'addresse ip pour se connecter en cas de client pour un multi. Ne sert a rien si le mode de connection est définis sur host <br/>
 
 
 # Fichier de configuration
