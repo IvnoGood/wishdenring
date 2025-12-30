@@ -128,12 +128,34 @@ def setup_demo(master):
         append_log("\n--- Starting program ---\n")
         thread = threading.Thread(target=run_program, daemon=True)
         thread.start()
+        RPC.update(
+            state="Joue a WishDenRing",
+            details="Est entrain de combattre des monstres",
+            large_image=(
+                "eldenwish"
+            ),
+            large_text="Killing !",
+            small_image=(
+                "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk4aTU0cXBlaW5lNzIxcDl5NmlnenAzZXl0emRrejkwZWMwbnoxaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dyI6cxt3iM154xESjP/giphy.gif"),
+            small_text="WAAAZAAA !",
+        )
 
     def stop_program():
         nonlocal process
         if process and process.poll() is None:
             process.terminate()
             append_log("\n--- Process terminated ---\n")
+            RPC.update(
+                state="Joue a WishDenRing",
+                details="Est actuellement dans le luncher",
+                large_image=(
+                    "eldenwish"
+                ),
+                large_text="Killing !",
+                small_image=(
+                    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk4aTU0cXBlaW5lNzIxcDl5NmlnenAzZXl0emRrejkwZWMwbnoxaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dyI6cxt3iM154xESjP/giphy.gif"),
+                small_text="WAAAZAAA !",
+            )
 
     start_btn = ttk.Button(
         gameFrame,
@@ -142,7 +164,7 @@ def setup_demo(master):
         command=start_program
     )
 
-    start_btn.pack(side=LEFT, padx=5)
+    start_btn.pack(side=LEFT, padx=5, pady=15)
 
     stop_btn = ttk.Button(
         gameFrame,
@@ -150,7 +172,7 @@ def setup_demo(master):
         bootstyle=DANGER,
         command=stop_program
     )
-    stop_btn.pack(side=LEFT, padx=5)
+    stop_btn.pack(side=LEFT, padx=5, pady=15)
     poll_log_queue()
 
     configGroup = ttk.Labelframe(
@@ -268,6 +290,8 @@ def setup_demo(master):
         if (filename):
             load(filename)
 
+    # ---
+
     settButtFrame = ttk.Frame(settingsFrame)
 
     saveIco = ImageTk.PhotoImage(Image.open("./assets/icons/download.png"))
@@ -301,11 +325,21 @@ def setup_demo(master):
     settIco.image = settIco
     nb.add(settingsFrame, text="Jeu", image=settIco, compound=LEFT)
 
+    # ---
+
     multiFrame = ttk.Frame(configGroup)
 
     grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/group.png"))
     grpIco.image = grpIco
     nb.add(multiFrame, text="Multijoueur", image=grpIco, compound=LEFT)
+
+    # ---
+
+    soundsFrame = ttk.Frame(configGroup)
+
+    grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/volume.png"))
+    grpIco.image = grpIco
+    nb.add(soundsFrame, text="Audio", image=grpIco, compound=LEFT)
     return root
 
 
@@ -319,13 +353,14 @@ if __name__ == '__main__':
         large_image=(
             "eldenwish"
         ),
-        large_text="Watching!",
+        large_text="Killing !",
         small_image=(
             "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk4aTU0cXBlaW5lNzIxcDl5NmlnenAzZXl0emRrejkwZWMwbnoxaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dyI6cxt3iM154xESjP/giphy.gif"),
-        small_text="Spinning",
+        small_text="WAAAZAAA !",
     )
 
-    app = ttk.Window("WishDenRing Luncher", iconphoto="./assets/icons/app.ico")
+    app = ttk.Window("WishDenRing Luncher",
+                     iconphoto="./assets/icons/eldenwish.png")
     app.resizable(width=False, height=False)
 
     bagel = setup_demo(app)

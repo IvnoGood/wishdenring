@@ -3,3 +3,4 @@ requests
 websockets
 numpy
 ttkbootstrap
+pypresence

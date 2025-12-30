@@ -286,6 +286,8 @@ class HandItem(Entity):
 
         elif (self.modelName == "fiole"):
             if held_keys["right mouse"]:
+                drinkSoundsAL = Audio('./assets/sounds/drink.ogg',
+                                      autoplay=True)
                 print("heal")
                 if (self.color == color.red):
                     health_bar_1.value += 30
@@ -735,6 +737,8 @@ def displayForNpc(pause):
         NpcThomasToolTip.enable()
         if (held_keys["t"]):
             print("opened gui")
+            openSoundsTH = Audio('./assets/sounds/click.ogg',
+                                 autoplay=True)
             NpcThomasToolTip.disable()
             time.sleep(0.25)
             mouse.locked = False
@@ -745,6 +749,8 @@ def displayForNpc(pause):
         AlexaToolTip.enable()
         if (held_keys["t"]):
             print("opened gui")
+            openSoundsAL = Audio('./assets/sounds/click.ogg',
+                                 autoplay=True)
             AlexaToolTip.disable()
             time.sleep(0.25)
             mouse.locked = False
@@ -921,6 +927,13 @@ boss_timer = time.time()
 
 clé_jump = False
 clé_lab = False
+# ------ AUDIO environement ------
+print("Loading sound...")
+environementSounds = Audio('./assets/sounds/ursina_audio_crestlands_part.ogg',
+                           loop=True, autoplay=True)
+environementSounds.volume = 0.1
+print("Loaded:", environementSounds)
+# ------ END AUDIO environement ------
 
 
 def update():
@@ -1051,16 +1064,6 @@ def update():
         enemy.color = color.white
     enemy.look_at(enemy.position + (direction_x, 0, direction_z))
 
-    # ------ AUDIO environement ------
-    if (not bgmusicIsPlaying):
-        print("Loading sound...")
-        environementSounds = Audio('./assets/sounds/env_1.mp3',
-                                   loop=True, autoplay=True)
-        environementSounds.volume = 5
-        print("Loaded:", environementSounds)
-        bgmusicIsPlaying = True
-    # ------ END AUDIO environement ------
-
     for i in checkpoints:
         if distance(player.position, checkpoints[i].position) <= 1.5:
             last_checkpoint = checkpoints[i]
@@ -1082,6 +1085,12 @@ def update():
     if pause == False:
         if held_keys['w']:
             move += direction * vitesse
+            if (not bgmusicIsPlaying):
+                """ environementSounds = Audio('./assets/sounds/footsteps.ogg', #! faites le sys de footsteps plz g full la flm
+                                           autoplay=True)
+                environementSounds.volume = 0.5 """
+                bgmusicIsPlaying = True
+
             if held_keys['shift']:
                 move += direction * vitesse
 
@@ -1446,31 +1455,35 @@ portailjump.collider = 'mesh'
 portailjump.color = color.orange
 
 dome_fermé = Entity(position=(1000, 1000, 1000),
-                    model='./assets/models/domeferme.obj',
+                    model='./assets/models/domefermé.obj',
                     collider='mesh',
                     rotation=(0, 0, 0),
                     scale=(17, 17, 17),
                     texture='brick',
                     color=color.white,
-                    texture_scale=(10, 10))
+                    texture_scale=(10, 10),
+                    double_sided=True)
+
 sol_dome = Entity(position=(1000, 984.8989, 1000),
                   model='plane',
                   scale=(50, 50, 50),
                   color=color.white,
-                  texture='brick',
                   texture_scale=(10, 10),
-                  collider='mesh')
+                  collider='box')
+
 labyrinthe = Entity(model='./assets/models/labyrinthe.obj',
                     position=(2000, 1000, 2000),
                     scale=(100, 100, 100),
                     texture='brick',
                     collider='mesh',
-                    texture_scale=(100, 100))
+                    texture_scale=(100, 100),
+                    double_sided=True)
+
 sol_labyrinthe = Entity(model='plane',                     # car défaut de modèle
                         position=(2050, 999.9, 1940),
-                        scale=(30, 30, 30),
+                        scale=(2000, 30, 2000),
                         texture='brick',
-                        collider='mesh',
+                        collider='box',
                         texture_scale=(5, 5))
 
 
@@ -1486,14 +1499,16 @@ jump = Entity(model='./assets/models/jump.obj',
               texture='brick',
               scale=(1, 1, 1),
               collider='mesh',
-              texture_scale=(15, 15))
+              texture_scale=(15, 15),
+              double_sided=True)
+
 fin_jump = Entity(model='cube',
                   position=(2985.72, 1033, 3035.53),
                   scale=(7, 1, 7),
                   collider='mesh',
                   texture_scale=(15, 15),
                   texture='brick')
-clé_jump = Entity(model='clé.obj',
+clé_jump = Entity(model='./assets/models/clé.obj',
                   position=(2987, 1036.5, 3035.53),
                   scale=(1, 1, 1),
                   color=color.yellow,
