@@ -1,6 +1,1 @@
-{
-    "user": {
-        "sensi": 45,
-        "renderDistance": 40
-    }
-}
+{"user": {"camera": {"sensi": 45, "renderDistance": 45}, "sounds": {"musics": 0.1, "ambientSounds": 1, "playerSounds": 0.5}}}

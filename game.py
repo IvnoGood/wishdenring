@@ -26,12 +26,24 @@ parser.add_argument('-ip', '--ipaddr', type=str,
                     help='Specify ip address and port as parameter (default: ws://localhost:8080)')
 args = parser.parse_args()
 
-config = {"user": {"sensi": 40, "renderDistance": 75}}
+config = {"user": {"camera": {"sensi": 45, "renderDistance": 45},
+                   "sounds": {"musics": 0.1, "ambientSounds": 1, "playerSounds": 0.5}}}
 
 if (args.config):
     with open(args.config, "r") as f:
         jsonData = json.load(f)
         config = jsonData
+
+sensibiliteVal = config["user"]["camera"]["sensi"]
+renderDistance = config["user"]["camera"]["renderDistance"]
+
+# musiques de fond, teleports
+musicSoundsVolume = config["user"]["sounds"]["musics"]
+# sons comme: dash, marche, shops, mort et combat
+ambientSoundsVolume = config["user"]["sounds"]["ambientSounds"]
+# sons comme: dash, mort et combat
+playerSoundsVolume = config["user"]["sounds"]["playerSounds"]
+
 
 structure_grotte = {
     0: Entity(model='cube', scale=(5, 5, 5), position=(10, 2, 20), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
@@ -49,7 +61,7 @@ tp_grotte = {
 }
 
 
-camera.clip_plane_far = config["user"]["renderDistance"]
+camera.clip_plane_far = renderDistance
 
 
 boss_room = {
@@ -235,7 +247,6 @@ class MoneyDisplay(Text):
 player = Character()
 player.rotation = (0, 35, 0)
 player.position = (10, 10, 0)
-inv = IventaireBas()
 speedFact = 5
 degatEpee = 1
 start_epee = time.time()
@@ -286,8 +297,9 @@ class HandItem(Entity):
 
         elif (self.modelName == "fiole"):
             if held_keys["right mouse"]:
-                drinkSoundsAL = Audio('./assets/sounds/drink.ogg',
-                                      autoplay=True)
+                drinkSound = Audio('./assets/sounds/drink.ogg',
+                                   autoplay=True)
+                drinkSound.volume = playerSoundsVolume
                 print("heal")
                 if (self.color == color.red):
                     health_bar_1.value += 30
@@ -306,6 +318,9 @@ class HandItem(Entity):
         global start_epee
         if time.time() - start_epee >= 1 and pause == False:
             start_epee = time.time()
+            swingSound = Audio('./assets/sounds/swordswoosh.ogg',
+                               autoplay=True)
+            swingSound.volume = playerSoundsVolume
             self.swinging = True
             print('swing')
             self.animate_rotation(
@@ -376,7 +391,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
              collider='box', origin_y=0.5, texture_scale=(64, 64), double_sided=True, shader=lit_with_shadows_shader)
  """
 Entity(model='plane', scale=64,
-       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/bricks.png", texture_scale=(64, 64))
+       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/stone/stonecob.png", texture_scale=(64, 64), color=color.rgba(0.8, 0.8, 0.8, 1))
 
 # ------ END TERRAIN ------
 
@@ -385,7 +400,7 @@ force_gravite = -1.5
 last_checkpoint = player.position
 
 player.mouse_sensitivity = Vec2(
-    config["user"]["sensi"], config["user"]["sensi"])
+    sensibiliteVal, sensibiliteVal)
 player.camera_pivot = Entity(parent=player, y=player.height)
 # camera.shader = ssao_shader  # ! c'est juste moche
 mouse.locked = True
@@ -658,6 +673,9 @@ class ShopButton(Button):
         super().__init__(text=title, color=defcolor)
 
         def takemymoney():
+            buySound = Audio('./assets/sounds/shopPurchase.ogg',
+                             autoplay=True)
+            buySound.volume = ambientSoundsVolume
             global coins
             op = coins - cost
             if (op > 0):
@@ -699,13 +717,13 @@ NpcThomasGUI = WindowPanel(
     title='Thomas - Forgeron',
     content=(
         ShopButton(title="Epée en bois - 16p", cost=16,
-                   model="katana", color=color.gray),
+                   model="katana", color=color.brown),
         ShopButton(title="Epée en fer - 128p", cost=128,
                    model="katana", color=color.gray),
         ShopButton(title="Epée en or - 256p", cost=256,
                    model="katana", color=color.gold),
         ShopButton(title="Epée en améthyste - 500p", cost=500,
-                   model="katana", color=color.gold),
+                   model="katana", color=color.magenta),
         GUIExitBtn()
     ),
     popup=False,
@@ -737,8 +755,9 @@ def displayForNpc(pause):
         NpcThomasToolTip.enable()
         if (held_keys["t"]):
             print("opened gui")
-            openSoundsTH = Audio('./assets/sounds/click.ogg',
-                                 autoplay=True)
+            openSoundTH = Audio('./assets/sounds/click.ogg',
+                                autoplay=True)
+            openSoundTH.volume = ambientSoundsVolume
             NpcThomasToolTip.disable()
             time.sleep(0.25)
             mouse.locked = False
@@ -749,8 +768,9 @@ def displayForNpc(pause):
         AlexaToolTip.enable()
         if (held_keys["t"]):
             print("opened gui")
-            openSoundsAL = Audio('./assets/sounds/click.ogg',
-                                 autoplay=True)
+            openSoundAL = Audio('./assets/sounds/click.ogg',
+                                autoplay=True)
+            openSoundAL.volume = ambientSoundsVolume
             AlexaToolTip.disable()
             time.sleep(0.25)
             mouse.locked = False
@@ -887,6 +907,9 @@ def degat():
     global pv_enemy_boss, pv_enemy_boss_max, delay, degatEpee, boss_win, boss_dmg
     # print("Point 3D sous la souris :", mouse.world_point)
     calc = pv_enemy_boss - degatEpee
+    bossHitSound = Audio('./assets/sounds/hitsword.ogg',
+                         autoplay=True)
+    bossHitSound.volume = ambientSoundsVolume
     if (calc <= 0):
         pv_enemy_boss -= degatEpee
         barre_de_vie_enemy.scale = (
@@ -931,7 +954,7 @@ clé_lab = False
 print("Loading sound...")
 environementSounds = Audio('./assets/sounds/ursina_audio_crestlands_part.ogg',
                            loop=True, autoplay=True)
-environementSounds.volume = 0.1
+environementSounds.volume = musicSoundsVolume
 print("Loaded:", environementSounds)
 # ------ END AUDIO environement ------
 
@@ -967,6 +990,9 @@ def update():
 
     if held_keys['q'] and time.time()-dash_cooldown >= 1.5 and pause == False:
         print('dash')
+        dashSound = Audio('./assets/sounds/dash.ogg',
+                          autoplay=True)
+        dashSound.volume = playerSoundsVolume
         dash_distance = 7
         if held_keys['a']:
             direction = -Vec3(camera.right.x, 0, camera.right.z).normalized()
@@ -1009,6 +1035,9 @@ def update():
 
             elif time.time() - boss_timer >= 1.65:
                 print("hit")
+                playerDamageSound = Audio('./assets/sounds/playerHit.ogg',
+                                          autoplay=True)
+                playerDamageSound.volume = playerSoundsVolume
                 health_bar_1.value -= boss_dmg
                 boss_timer = time.time()
         else:
@@ -1020,6 +1049,9 @@ def update():
             coins = 0
 
     if death == True:
+        deathBossSound = Audio('./assets/sounds/death.ogg',
+                               autoplay=True)
+        deathBossSound.volume = playerSoundsVolume
         player.position = (last_checkpoint.x,
                            last_checkpoint.y+5, last_checkpoint.z)
         player.rotation = (0, 0, 0)
@@ -1102,19 +1134,26 @@ def update():
         if held_keys['d']:
             move += Vec3(camera.right.x, 0,
                          camera.right.z).normalized() * vitesse
+
+    portailTpSound = Audio('./assets/sounds/teleport.ogg', autoplay=False)
+    portailTpSound.volume = ambientSoundsVolume
+
     portail.look_at(player)
     portail.rotation_y = portail.rotation_y + 180
     portail.rotation_x = 0
     portail.rotation_z = 0
-    if player.intersects(portail):
+    if distance(player, portail) < 2:
         player.position = (1000, 986, 1000)
+        portailTpSound.play()
 
     portail2.look_at(player)
     portail2.rotation_y = portail2.rotation_y + 180
     portail2.rotation_x = 0
     portail2.rotation_z = 0
-    if player.intersects(portail2):
-        player.position = (0, 0, 0)
+    if distance(player, portail2) < 2:
+        player.position = (last_checkpoint.x,
+                           last_checkpoint.y+5, last_checkpoint.z)
+        portailTpSound.play()
 
     portail3.look_at(player)
     portail3.rotation_y = portail3.rotation_y + 180
@@ -1125,11 +1164,14 @@ def update():
     portail4.rotation_y = portail4.rotation_y + 180
     portail4.rotation_x = 0
     portail4.rotation_z = 0
-    if player.intersects(portail4):
+
+    if distance(player, portail4) < 4:
         player.position = (3000, 1001.5, 3001.7)
+        portailTpSound.play()
         jump = True
         if player.intersects(lave_jump):
-            player.position = (0, 0, 0)
+            player.position = (last_checkpoint.x,
+                               last_checkpoint.y+5, last_checkpoint.z)
             jump = False
 
     portail5.look_at(player)
@@ -1141,9 +1183,10 @@ def update():
     portail6.rotation_y = portail6.rotation_y + 180
     portail6.rotation_x = 0
     portail6.rotation_z = 0
-    if player.intersects(portail6):
-        # player.position = (1904.5, 1005, 2095.5)
-        player.position = (2056, 1002, 1938)
+    if distance(player, portail6) < 4:
+        portailTpSound.play()
+        player.position = Vec3(1957.1273, 1005, 2092.245)
+        # player.position = (2057.5, 1045, 1941) WIN IS HERE
 
     portail7.look_at(player)
     portail7.rotation_y = portail7.rotation_y + 180
@@ -1164,8 +1207,9 @@ def update():
     portaillab.rotation_y = portaillab.rotation_y + 180
     portaillab.rotation_x = 0
     portaillab.rotation_z = 0
-    if player.intersects(portaillab):
+    if distance(player, portaillab) < 2:
         player.position = (1000, 986, 1000)
+        portailTpSound.play()
 
     portailjump.look_at(player)
     portailjump.rotation_y = portailjump.rotation_y + 180
@@ -1173,9 +1217,14 @@ def update():
     portailjump.rotation_z = 0
     if player.intersects(portailjump):
         player.position = (1000, 986, 1000)
+        portailTpSound.play()
         jump = False
     if player.intersects(lave_jump):
-        player.position = (0, 0, 0)
+        player.position = (last_checkpoint.x,
+                           last_checkpoint.y+5, last_checkpoint.z)
+        deathSound = Audio('./assets/sounds/death.ogg',
+                           autoplay=True)
+        deathSound.volume = playerSoundsVolume
         jump = False
     if jump == True:
         lave_jump.y += 0.25 * time.dt
@@ -1260,7 +1309,13 @@ def update():
 
     for i in tp_grotte:
         if distance(player.position, tp_grotte[i]["portal"].position) <= 2.5:
+            portailTpSound = Audio('./assets/sounds/teleport.ogg',
+                                   autoplay=True)
+            portailTpSound.volume = ambientSoundsVolume
             print("Début combat de boss")
+            bossStartSound = Audio('./assets/sounds/bossintro.ogg',
+                                   autoplay=True)
+            bossStartSound.volume = ambientSoundsVolume
             msg.enable()
             tp_grotte_boss.collider = None
             tp_grotte_boss.visible = None
@@ -1441,7 +1496,7 @@ portaillab.play_animation('pouet3')
 portaillab.position = (2057.5, 1002.5, 1939)
 portaillab.scale = (5.5, 5.5)
 portaillab.collider = 'mesh'
-portaillab.color = color.blue
+portaillab.color = color.orange
 
 portailjump = SpriteSheetAnimation(   # portail du labyrinthe
     texture='Dimensional_Portal.png',
@@ -1459,7 +1514,7 @@ dome_fermé = Entity(position=(1000, 1000, 1000),
                     collider='mesh',
                     rotation=(0, 0, 0),
                     scale=(17, 17, 17),
-                    texture='brick',
+                    texture='./assets/textures/stone/stonebricks0001.png',
                     color=color.white,
                     texture_scale=(10, 10),
                     double_sided=True)
@@ -1467,14 +1522,14 @@ dome_fermé = Entity(position=(1000, 1000, 1000),
 sol_dome = Entity(position=(1000, 984.8989, 1000),
                   model='plane',
                   scale=(50, 50, 50),
-                  color=color.white,
+                  color=color.rgba(0, 0, 0, 0),
                   texture_scale=(10, 10),
                   collider='box')
 
 labyrinthe = Entity(model='./assets/models/labyrinthe.obj',
                     position=(2000, 1000, 2000),
                     scale=(100, 100, 100),
-                    texture='brick',
+                    texture='./assets/textures/stone/stonebricks0001.png',
                     collider='mesh',
                     texture_scale=(100, 100),
                     double_sided=True)
@@ -1484,6 +1539,7 @@ sol_labyrinthe = Entity(model='plane',                     # car défaut de mod�
                         scale=(2000, 30, 2000),
                         texture='brick',
                         collider='box',
+                        color=color.rgba(0, 0, 0, 5),
                         texture_scale=(5, 5))
 
 
@@ -1494,7 +1550,7 @@ clé_lab = Entity(model='./assets/models/clé.obj',
                  collider='mesh',
                  rotation_x=90)
 
-jump = Entity(model='./assets/models/jump.obj',
+jump = Entity(model='./assets/models/jump2.obj',
               position=(3000, 1000, 3000),
               texture='brick',
               scale=(1, 1, 1),
@@ -1519,7 +1575,7 @@ lave_jump = Entity(model='plane',
                    texture='./assets/textures/lave.png',
                    scale=(1000, 1000, 1000),
                    texture_scale=(500, 500),
-                   collider='mesh')
+                   collider='box')
 
 grille_portail5 = Entity(model='./assets/models/grille.obj',
                          color=color.gray,

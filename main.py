@@ -267,8 +267,15 @@ def setup_demo(master):
     def save():
         configFile = {
             "user": {
-                "sensi": int(sensi.get()),
-                "renderDistance": int(render.get())
+                "camera": {
+                    "sensi": int(sensi.get()),
+                    "renderDistance": int(render.get())
+                },
+                "sounds": {
+                    "musics": musicSound.get(),
+                    "ambientSounds": ambientSound.get(),
+                    "playerSounds": playerSound.get()
+                }
             }
         }
         with open("./config.json", "w") as config:
@@ -277,8 +284,8 @@ def setup_demo(master):
     def load(path):
         with open(path, "r") as f:
             jsondat = json.load(f)
-            sensi.set(jsondat['user']['sensi'])
-            render.set(jsondat['user']['renderDistance'])
+            sensi.set(jsondat['user']["camera"]['sensi'])
+            render.set(jsondat['user']["camera"]['renderDistance'])
 
     def browseFiles():
         filename = filedialog.askopenfilename(initialdir="./",
@@ -289,8 +296,6 @@ def setup_demo(master):
                                                          "*.*")))
         if (filename):
             load(filename)
-
-    # ---
 
     settButtFrame = ttk.Frame(settingsFrame)
 
@@ -327,15 +332,54 @@ def setup_demo(master):
 
     # ---
 
-    multiFrame = ttk.Frame(configGroup)
+    """ multiFrame = ttk.Frame(configGroup)
 
     grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/group.png"))
     grpIco.image = grpIco
-    nb.add(multiFrame, text="Multijoueur", image=grpIco, compound=LEFT)
+    nb.add(multiFrame, text="Multijoueur", image=grpIco, compound=LEFT) """
 
     # ---
 
     soundsFrame = ttk.Frame(configGroup)
+
+    musicSoundFrame = ttk.Frame(soundsFrame)
+    musicSoundLabel = ttk.Label(
+        musicSoundFrame, text="Music : ").pack(side=LEFT, fill=X)
+    musicSound = ttk.Scale(
+        master=musicSoundFrame,
+        orient=HORIZONTAL,
+        value=.1,
+        from_=0,
+        to=1
+    )
+    musicSound.pack(fill=X, pady=5, expand=YES)
+    musicSoundFrame.pack(fill=X, padx=3, pady=5)
+
+    ambientSoundFrame = ttk.Frame(soundsFrame)
+    ambientSoundLabel = ttk.Label(
+        ambientSoundFrame, text="Ambient : ").pack(side=LEFT, fill=X)
+    ambientSound = ttk.Scale(
+        master=ambientSoundFrame,
+        orient=HORIZONTAL,
+        value=1,
+        from_=0,
+        to=1
+    )
+    ambientSound.pack(fill=X, pady=5, expand=YES)
+    ambientSoundFrame.pack(fill=X, padx=3, pady=5)
+
+    playerSoundFrame = ttk.Frame(soundsFrame)
+    playerSoundLabel = ttk.Label(
+        playerSoundFrame, text="Player : ").pack(side=LEFT, fill=X)
+    playerSound = ttk.Scale(
+        master=playerSoundFrame,
+        orient=HORIZONTAL,
+        value=.5,
+        from_=0,
+        to=1
+    )
+    playerSound.pack(fill=X, pady=5, expand=YES)
+    playerSoundFrame.pack(fill=X, padx=3, pady=5)
 
     grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/volume.png"))
     grpIco.image = grpIco
