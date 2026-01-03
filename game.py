@@ -52,6 +52,7 @@ portail3 = SpriteSheetAnimation(   # portail du premier boss
 portail3.play_animation('pouet3')
 portail3.position = (1015.7, 989, 998.2)
 portail3.scale = (8, 8)
+portail3._double_sided = True
 portail3.color = color.magenta
 
 
@@ -427,7 +428,7 @@ Entity(model='plane', scale=64,
 # ------ END TERRAIN ------
 
 vitesse_chute = 0
-force_gravite = -1.5
+force_gravite = -1.0
 last_checkpoint = player.position
 
 player.mouse_sensitivity = Vec2(
@@ -1375,6 +1376,7 @@ portail = SpriteSheetAnimation(    # portail du lobby
 portail.play_animation('pouet')
 portail.position = Vec3(10, 4, 20)
 portail.scale = (8, 8)
+portail._double_sided = True
 
 portailAff = Entity(
     model="plane",
@@ -1393,6 +1395,7 @@ portail2 = SpriteSheetAnimation(     # portail pour aller au lobby
 portail2.play_animation('pouet2')
 portail2.position = (1012, 989, 1009.23)
 portail2.scale = (8, 8)
+portail2._double_sided = True
 
 portail2Aff = Entity(
     model="plane",
@@ -1420,6 +1423,7 @@ portail4 = SpriteSheetAnimation(   # portail du jump avec lave
 portail4.play_animation('pouet4')
 portail4.position = (1008.6, 989, 986.78)
 portail4.scale = (8, 8)
+portail4._double_sided = True
 portail4.color = color.orange
 
 portail4Aff = Entity(
@@ -1439,6 +1443,7 @@ portail4Aff = Entity(
 portail5.play_animation('pouet3')
 portail5.position = (996.2, 989, 984.7)
 portail5.scale = (8, 8)
+portail._double_sided = True
 portail5.color = color.yellow
  """
 
@@ -1450,6 +1455,7 @@ portail6 = SpriteSheetAnimation(   # portail labyrinthe
 portail6.play_animation('pouet3')
 portail6.position = (987, 989, 991.4)
 portail6.scale = (8, 8)
+portail6._double_sided = True
 portail6.color = color.blue
 
 portail6Aff = Entity(
@@ -1470,6 +1476,7 @@ portail6Aff = Entity(
 portail7.play_animation('pouet3')
 portail7.position = (984.5, 989, 1003.6)
 portail7.scale = (8, 8)
+portail._double_sided = True
 portail7.color = color.pink """
 
 
@@ -1481,6 +1488,7 @@ portail7.color = color.pink """
 portail8.play_animation('pouet3')
 portail8.position = (991.87, 989, 1013)
 portail8.scale = (8, 8)
+portail._double_sided = True
 portail8.color = color.azure
  """
 
@@ -1492,6 +1500,7 @@ portail8.color = color.azure
 portail9.play_animation('pouet3')
 portail9.position = (1002, 989, 1015.7)
 portail9.scale = (8, 8)
+portail._double_sided = True
 portail9.color = color.red """
 
 portaillab = SpriteSheetAnimation(   # portail du labyrinthe
@@ -1510,7 +1519,7 @@ portailjump = SpriteSheetAnimation(   # portail du labyrinthe
     fps=8,
     animations={'pouet3': ((0, 0), (2, 1))})
 portailjump.play_animation('pouet3')
-portailjump.position = (2985.72, 1037, 3035.53)
+portailjump.position = Vec3(3012.7204, 1040.232, 3035.33)
 portailjump.scale = (5, 5)
 portailjump.color = color.orange
 
@@ -1555,22 +1564,23 @@ clé_lab = Entity(model='./assets/models/clé.obj',
                  collider='mesh',
                  rotation_x=90)
 
-jump = Entity(model='./assets/models/jump2.obj',
+jump = Entity(model='./assets/models/jump22.obj',
               position=(3000, 1000, 3000),
               texture='brick',
               scale=(1, 1, 1),
               collider='mesh',
               texture_scale=(15, 15),
-              double_sided=True)
-
+              double_sided=True,
+              use_cache=False)
+""" 
 fin_jump = Entity(model='cube',
                   position=(2985.72, 1033, 3035.53),
                   scale=(7, 1, 7),
                   collider='mesh',
                   texture_scale=(15, 15),
-                  texture='brick')
+                  texture='brick') """
 clé_jump = Entity(model='./assets/models/clé.obj',
-                  position=(2987, 1036.5, 3035.53),
+                  position=Vec3(3011.3547, 1036.232, 3035.4333),
                   scale=(1, 1, 1),
                   color=color.yellow,
                   rotation_x=90,
