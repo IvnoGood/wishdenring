@@ -44,14 +44,19 @@ ambientSoundsVolume = config["user"]["sounds"]["ambientSounds"]
 # sons comme: dash, mort et combat
 playerSoundsVolume = config["user"]["sounds"]["playerSounds"]
 
+portail3 = SpriteSheetAnimation(   # portail du premier boss
+    texture='Dimensional_Portal.png',
+    tileset_size=(3, 2),
+    fps=8,
+    animations={'pouet3': ((0, 0), (2, 1))})
+portail3.play_animation('pouet3')
+portail3.position = (1015.7, 989, 998.2)
+portail3.scale = (8, 8)
+portail3.color = color.magenta
 
-structure_grotte = {
-    0: Entity(model='cube', scale=(5, 5, 5), position=(10, 2, 20), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
-    1: Entity(model='cube', scale=(3.5, 1.25, 3.5), position=(10, 4.5, 20), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
-    2: Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 2, 23), collider='box', texture='brick', color=color.gray, texture_scale=(10, 10)),
-}
+
 tp_grotte = {
-    0: {"portal": Entity(model='cube', scale=(2.5, 4, 2.5), position=(10, 1, 18.748), collider='box', texture='brick', color=color.black, texture_scale=(10, 10)),
+    0: {"portal": portail3,
         "mobNmb": 1,
         "boss": Entity(),
         "isSpe": False,
@@ -68,11 +73,37 @@ boss_room = {
     1: Entity(model='plane', scale=60, texture='./assets/textures/concrete_0.png', collider='box', position=(500, -0.5, 500), texture_scale=(60, 60))
 }
 
-fontaine = Entity(model='/assets/models/fontaine.obj', scale=(0.85, 0.85, 0.85),
-                  position=(10, 0.7, -10), collider='mesh', texture='brick', color=color.gray, texture_scale=(10, 10), shader=lit_with_shadows_shader)
-eau = Entity(model='cube', scale=(8.75, 0.35, 8.75), position=(
-    10, 0.2, -10), collider='box', color=color.blue,)
-eau.rotation = (0, 45, 0)
+fontaine = Entity(
+    model='/assets/models/fontaine.obj',
+    scale=(0.85, 0.85, 0.85),
+    position=(10, 0.7, -10),
+    collider='mesh',
+    color=color.light_gray,
+    texture_scale=(10, 10),
+    shader=lit_with_shadows_shader,
+    texture="./assets/textures/concrete_0.png"
+)
+
+Eau = Entity(
+    model='cube',
+    scale=(8.75, 0.35, 8.75),
+    position=(10, 0.75, -10),
+    collider='box',
+    texture="./assets/textures/tex_Water.jpg",
+    color=color.rgba(1, 1, 1, 0.95),
+    rotation=(0, 45, 0),
+    texture_scale=(5, 5)
+)
+
+fondEau = Entity(
+    model='cube',
+    scale=(8.75, 0.35, 8.75),
+    position=(10, 0.2, -10),
+    collider='box',
+    texture="./assets/textures/stone/stonecob.png",
+    rotation=(0, 45, 0),
+    texture_scale=(5, 5)
+)
 
 
 class Character(Entity):
@@ -391,7 +422,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
              collider='box', origin_y=0.5, texture_scale=(64, 64), double_sided=True, shader=lit_with_shadows_shader)
  """
 Entity(model='plane', scale=64,
-       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/stone/stonecob.png", texture_scale=(64, 64), color=color.rgba(0.8, 0.8, 0.8, 1))
+       shader=lit_with_shadows_shader, collider="box", texture="brick", texture_scale=(64, 64), color=color.rgba(0.8, 0.8, 0.8, 1))
 
 # ------ END TERRAIN ------
 
@@ -569,11 +600,11 @@ coins = 50
 
 light = DirectionalLight(shadows=True, position=Vec3(5, 5, -20))
 light_look_pos = Vec3(10., 0.5, 15)
-pointer = Entity(model="cube", position=light_look_pos,
+""" pointer = Entity(model="cube", position=light_look_pos,
                  color=color.red, scale=1)
 
 pointer = Entity(model="cube", position=light.position,
-                 color=color.red, scale=1)
+                 color=color.red, scale=1) """
 
 light.look_at(light_look_pos)
 
@@ -791,27 +822,6 @@ def displayForNpc(pause):
 
 # ------ NPC DISSCUSSION END------
 
-# ------ NATURES ------
-# Flowers
-for i in range(0):
-    max = 100
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    flower1 = Entity(
-        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, 45, 0), double_sided=True)
-    flower2 = Entity(
-        model="plane", texture="./assets/textures/plants/rose.png", position=pos, rotation=(270, -45, 0), double_sided=True)
-
-for i in range(0):
-    max = 100
-    pos = (randint(-max, max), 0.5, randint(-max, max))
-    type = randint(1, 3)
-    flower1 = Entity(
-        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, 45, 0), double_sided=True)
-    flower2 = Entity(
-        model="plane", texture=f"./assets/textures/plants/Grass_0{type}.png", position=pos, rotation=(270, -45, 0), double_sided=True)
-
-# ------ NATURES END ----
-
 
 # ------ CLOUDS ------
 clouds = []
@@ -880,7 +890,7 @@ class DroppedItem(Entity):
                         break
 
 
-""" 
+"""
 coin = DroppedItem(modelEnt="./assets/models/coin.obj",
                    pos=(4, 0.125, 4),
                    scaleEnt=0.125,
@@ -987,6 +997,8 @@ def update():
 
     if (held_keys["l"]):
         print(player.position)
+        print([portail.rotation, portail2.rotation, portail3.rotation,
+              portail4.rotation, portail6.rotation])
 
     if held_keys['q'] and time.time()-dash_cooldown >= 1.5 and pause == False:
         print('dash')
@@ -1077,7 +1089,7 @@ def update():
             enemy.position[0]+4, enemy.position[1], enemy.position[2])
         tp_grotte_boss.position = (520, 1, 500)
 
-        if distance(tp_grotte_boss, player) < 2:
+        if distance(tp_grotte_boss, player) < 3:
             player.position = (0, 1, 0)
             sky.texture = sky_path
             boss_battle = False
@@ -1138,33 +1150,21 @@ def update():
     portailTpSound = Audio('./assets/sounds/teleport.ogg', autoplay=False)
     portailTpSound.volume = ambientSoundsVolume
 
-    portail.look_at(player)
-    portail.rotation_y = portail.rotation_y + 180
-    portail.rotation_x = 0
-    portail.rotation_z = 0
-    if distance(player, portail) < 2:
+    portail.rotation = Vec3(0, 0.56399536, 0)
+    if distance(player, portail) < 4:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
 
-    portail2.look_at(player)
-    portail2.rotation_y = portail2.rotation_y + 180
-    portail2.rotation_x = 0
-    portail2.rotation_z = 0
-    if distance(player, portail2) < 2:
+    portail2.rotation = Vec3(0, 52.433784, 0)
+    if distance(player, portail2) < 4:
         player.position = (last_checkpoint.x,
                            last_checkpoint.y+5, last_checkpoint.z)
         portailTpSound.play()
 
-    portail3.look_at(player)
-    portail3.rotation_y = portail3.rotation_y + 180
-    portail3.rotation_x = 0
-    portail3.rotation_z = 0
+    portail3.rotation = Vec3(0, 96.54034, 0)
+    # PRIS PR LE BOSS DE VIK
 
-    portail4.look_at(player)
-    portail4.rotation_y = portail4.rotation_y + 180
-    portail4.rotation_x = 0
-    portail4.rotation_z = 0
-
+    portail4.rotation = Vec3(0, 146.95483, 0)
     if distance(player, portail4) < 4:
         player.position = (3000, 1001.5, 3001.7)
         portailTpSound.play()
@@ -1174,40 +1174,17 @@ def update():
                                last_checkpoint.y+5, last_checkpoint.z)
             jump = False
 
-    portail5.look_at(player)
-    portail5.rotation_y = portail5.rotation_y + 180
-    portail5.rotation_x = 0
-    portail5.rotation_z = 0
-
-    portail6.look_at(player)
-    portail6.rotation_y = portail6.rotation_y + 180
-    portail6.rotation_x = 0
-    portail6.rotation_z = 0
+    portail6.rotation = Vec3(0, 236.51391, 0)
     if distance(player, portail6) < 4:
         portailTpSound.play()
         player.position = Vec3(1957.1273, 1005, 2092.245)
         # player.position = (2057.5, 1045, 1941) WIN IS HERE
 
-    portail7.look_at(player)
-    portail7.rotation_y = portail7.rotation_y + 180
-    portail7.rotation_x = 0
-    portail7.rotation_z = 0
-
-    portail8.look_at(player)
-    portail8.rotation_y = portail8.rotation_y + 180
-    portail8.rotation_x = 0
-    portail8.rotation_z = 0
-
-    portail9.look_at(player)
-    portail9.rotation_y = portail9.rotation_y + 180
-    portail9.rotation_x = 0
-    portail9.rotation_z = 0
-
     portaillab.look_at(player)
     portaillab.rotation_y = portaillab.rotation_y + 180
     portaillab.rotation_x = 0
     portaillab.rotation_z = 0
-    if distance(player, portaillab) < 2:
+    if distance(player, portaillab) < 4:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
 
@@ -1222,6 +1199,7 @@ def update():
     if player.intersects(lave_jump):
         player.position = (last_checkpoint.x,
                            last_checkpoint.y+5, last_checkpoint.z)
+        health_bar_1.value = 100
         deathSound = Audio('./assets/sounds/death.ogg',
                            autoplay=True)
         deathSound.volume = playerSoundsVolume
@@ -1240,10 +1218,10 @@ def update():
     else:
         clé_lab.color = color.yellow
 
-    grille_portail5.look_at(player)
+    """ grille_portail5.look_at(player)
     grille_portail5.rotation_y += 90
     grille_portail5.rotation_x = 0
-    grille_portail5.rotation_z = 0
+    grille_portail5.rotation_z = 0 """
 
     # collisions X
     old_x = player.x
@@ -1308,7 +1286,7 @@ def update():
             pause_menu = False
 
     for i in tp_grotte:
-        if distance(player.position, tp_grotte[i]["portal"].position) <= 2.5:
+        if distance(player.position, tp_grotte[i]["portal"].position) <= 3:
             portailTpSound = Audio('./assets/sounds/teleport.ogg',
                                    autoplay=True)
             portailTpSound.volume = ambientSoundsVolume
@@ -1395,9 +1373,17 @@ portail = SpriteSheetAnimation(    # portail du lobby
     animations={'pouet': ((0, 0), (2, 1))})
 
 portail.play_animation('pouet')
-portail.position = (-10, 3, 10)
+portail.position = Vec3(10, 4, 20)
 portail.scale = (8, 8)
-portail.collider = 'mesh'
+
+portailAff = Entity(
+    model="plane",
+    rotation=(270, 0, 0),
+    texture="./assets/textures/salleSign.png",
+    double_sided=True,
+    position=(10.25, 9, 20),
+    scale=(4, 1, 2),
+)
 
 portail2 = SpriteSheetAnimation(     # portail pour aller au lobby
     texture='Dimensional_Portal.png',
@@ -1407,18 +1393,24 @@ portail2 = SpriteSheetAnimation(     # portail pour aller au lobby
 portail2.play_animation('pouet2')
 portail2.position = (1012, 989, 1009.23)
 portail2.scale = (8, 8)
-portail2.collider = 'mesh'
 
-portail3 = SpriteSheetAnimation(   # portail du premier boss
-    texture='Dimensional_Portal.png',
-    tileset_size=(3, 2),
-    fps=8,
-    animations={'pouet3': ((0, 0), (2, 1))})
-portail3.play_animation('pouet3')
-portail3.position = (1015.7, 989, 998.2)
-portail3.scale = (8, 8)
-portail3.collider = 'mesh'
-portail3.color = color.magenta
+portail2Aff = Entity(
+    model="plane",
+    rotation=(270, 52.433784, 0),
+    texture="./assets/textures/retourSign.png",
+    double_sided=True,
+    position=(1012.25, 994, 1009.23),
+    scale=(4, 1, 2),
+)
+
+portail3Aff = Entity(
+    model="plane",
+    rotation=(270,  96.54034, 0),
+    texture="./assets/textures/shrekSign.png",
+    double_sided=True,
+    position=(1015.95, 994, 998.2),
+    scale=(4, 1, 2),
+)
 
 portail4 = SpriteSheetAnimation(   # portail du jump avec lave
     texture='Dimensional_Portal.png',
@@ -1428,10 +1420,18 @@ portail4 = SpriteSheetAnimation(   # portail du jump avec lave
 portail4.play_animation('pouet4')
 portail4.position = (1008.6, 989, 986.78)
 portail4.scale = (8, 8)
-portail4.collider = 'mesh'
 portail4.color = color.orange
 
-portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
+portail4Aff = Entity(
+    model="plane",
+    rotation=(270, 146.95483, 0),
+    texture="./assets/textures/jumpSign.png",
+    double_sided=True,
+    position=(1008.85, 994, 986.78),
+    scale=(4, 1, 2),
+)
+
+""" portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
     texture='Dimensional_Portal.png',
     tileset_size=(3, 2),
     fps=8,
@@ -1439,8 +1439,8 @@ portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
 portail5.play_animation('pouet3')
 portail5.position = (996.2, 989, 984.7)
 portail5.scale = (8, 8)
-portail5.collider = 'mesh'
 portail5.color = color.yellow
+ """
 
 portail6 = SpriteSheetAnimation(   # portail labyrinthe
     texture='Dimensional_Portal.png',
@@ -1450,10 +1450,19 @@ portail6 = SpriteSheetAnimation(   # portail labyrinthe
 portail6.play_animation('pouet3')
 portail6.position = (987, 989, 991.4)
 portail6.scale = (8, 8)
-portail6.collider = 'mesh'
 portail6.color = color.blue
 
-portail7 = SpriteSheetAnimation(   # portail prof de NSI
+portail6Aff = Entity(
+    model="plane",
+    rotation=(270,  236.51391, 0),
+    texture="./assets/textures/labSign.png",
+    double_sided=True,
+    position=(987.25, 994, 991.4),
+    scale=(4, 1, 2),
+)
+
+
+""" portail7 = SpriteSheetAnimation(   # portail prof de NSI
     texture='Dimensional_Portal.png',
     tileset_size=(3, 2),
     fps=8,
@@ -1461,11 +1470,10 @@ portail7 = SpriteSheetAnimation(   # portail prof de NSI
 portail7.play_animation('pouet3')
 portail7.position = (984.5, 989, 1003.6)
 portail7.scale = (8, 8)
-portail7.collider = 'mesh'
-portail7.color = color.pink
+portail7.color = color.pink """
 
 
-portail8 = SpriteSheetAnimation(   # portail dimension vide
+""" portail8 = SpriteSheetAnimation(   # portail dimension vide
     texture='Dimensional_Portal.png',
     tileset_size=(3, 2),
     fps=8,
@@ -1473,10 +1481,10 @@ portail8 = SpriteSheetAnimation(   # portail dimension vide
 portail8.play_animation('pouet3')
 portail8.position = (991.87, 989, 1013)
 portail8.scale = (8, 8)
-portail8.collider = 'mesh'
 portail8.color = color.azure
+ """
 
-portail9 = SpriteSheetAnimation(   # portail boss final
+""" portail9 = SpriteSheetAnimation(   # portail boss final
     texture='Dimensional_Portal.png',
     tileset_size=(3, 2),
     fps=8,
@@ -1484,8 +1492,7 @@ portail9 = SpriteSheetAnimation(   # portail boss final
 portail9.play_animation('pouet3')
 portail9.position = (1002, 989, 1015.7)
 portail9.scale = (8, 8)
-portail9.collider = 'mesh'
-portail9.color = color.red
+portail9.color = color.red """
 
 portaillab = SpriteSheetAnimation(   # portail du labyrinthe
     texture='Dimensional_Portal.png',
@@ -1495,7 +1502,6 @@ portaillab = SpriteSheetAnimation(   # portail du labyrinthe
 portaillab.play_animation('pouet3')
 portaillab.position = (2057.5, 1002.5, 1939)
 portaillab.scale = (5.5, 5.5)
-portaillab.collider = 'mesh'
 portaillab.color = color.orange
 
 portailjump = SpriteSheetAnimation(   # portail du labyrinthe
@@ -1506,7 +1512,6 @@ portailjump = SpriteSheetAnimation(   # portail du labyrinthe
 portailjump.play_animation('pouet3')
 portailjump.position = (2985.72, 1037, 3035.53)
 portailjump.scale = (5, 5)
-portailjump.collider = 'mesh'
 portailjump.color = color.orange
 
 dome_fermé = Entity(position=(1000, 1000, 1000),
@@ -1577,10 +1582,10 @@ lave_jump = Entity(model='plane',
                    texture_scale=(500, 500),
                    collider='box')
 
-grille_portail5 = Entity(model='./assets/models/grille.obj',
+""" grille_portail5 = Entity(model='./assets/models/grille.obj',
                          color=color.gray,
                          position=(995.8, 986, 986),
                          rotation=portail5.rotation,
                          scale=(0.16, 0.16, 0.16),)
-
+ """
 app.run()
