@@ -10,6 +10,11 @@ import asyncio
 import json
 import time
 import argparse
+from panda3d.core import GraphicsPipeSelection
+
+print(GraphicsPipeSelection.get_global_ptr(
+).get_default_pipe().get_interface_name())
+
 
 app = Ursina(icon="./assets/icons/app.ico", title="WishDenRing")
 

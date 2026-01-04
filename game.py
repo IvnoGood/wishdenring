@@ -82,7 +82,8 @@ fontaine = Entity(
     color=color.light_gray,
     texture_scale=(10, 10),
     shader=lit_with_shadows_shader,
-    texture="./assets/textures/concrete_0.png"
+    texture="./assets/textures/concrete_0.png",
+    double_sided=True
 )
 
 Eau = Entity(
@@ -858,7 +859,9 @@ class DroppedItem(Entity):
             scale=scaleEnt,
             color=colorEnt,
             texture=textureEnt,
-            collider=collider
+            collider=collider,
+            double_sided=True,
+            shader=lit_with_shadows_shader
         )
         self.modelName = modelName
         self.picked_up = False
@@ -904,6 +907,14 @@ erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      scaleEnt=0.25,
                      colorEnt=color.red,
                      modelName="fiole") """
+
+erlenR = DroppedItem(modelEnt="./assets/models/clé.obj",
+                     pos=(5, 0, 2),
+                     scaleEnt=0.5,
+                     colorEnt=color.yellow,
+                     modelName="clé",
+                     coinValue=20)
+
 boss_dmg = 25
 boss_win = False
 tp_grotte_boss = Entity(model='cube',
@@ -941,6 +952,12 @@ def degat():
                            colorEnt=color.yellow,
                            modelName="coin",
                            coinValue=randint(50, 75))
+        clé_jump = DroppedItem(modelEnt="./assets/models/clé.obj",
+                               pos=location,
+                               scaleEnt=0.5,
+                               colorEnt=color.orange,
+                               modelName="clé"
+                               )
         tp_grotte_boss.visible = True
         tp_grotte_boss.collider = 'box'
         tp_grotte_boss.position = Vec3(520, 1, 500)
@@ -1166,7 +1183,34 @@ def update():
     # PRIS PR LE BOSS DE VIK
 
     portail4.rotation = Vec3(0, 146.95483, 0)
+    jump = None
+    clé_jump = None
+    lave_jump = None
     if distance(player, portail4) < 4:
+
+        jumpModel = Entity(model='./assets/models/jump22.obj',
+                           position=(3000, 1000, 3000),
+                           texture='brick',
+                           scale=(1, 1, 1),
+                           collider='mesh',
+                           texture_scale=(15, 15),
+                           double_sided=True,
+                           use_cache=False)
+
+        clé_jump = DroppedItem(modelEnt="./assets/models/clé.obj",
+                               pos=Vec3(3011.3547, 1036.232, 3035.4333),
+                               scaleEnt=0.5,
+                               colorEnt=color.blue,
+                               modelName="clé"
+                               )
+
+        lave_jump = Entity(model='plane',
+                           position=(3000, 980, 3000),
+                           texture='./assets/textures/lave.png',
+                           scale=(1000, 1000, 1000),
+                           texture_scale=(500, 500),
+                           collider='box')
+
         player.position = (3000, 1001.5, 3001.7)
         portailTpSound.play()
         jump = True
@@ -1197,23 +1241,26 @@ def update():
         player.position = (1000, 986, 1000)
         portailTpSound.play()
         jump = False
-    if player.intersects(lave_jump):
-        player.position = (last_checkpoint.x,
-                           last_checkpoint.y+5, last_checkpoint.z)
-        health_bar_1.value = 100
-        deathSound = Audio('./assets/sounds/death.ogg',
-                           autoplay=True)
-        deathSound.volume = playerSoundsVolume
-        jump = False
+
     if jump == True:
         lave_jump.y += 0.25 * time.dt
+        if player.intersects(lave_jump):
+            player.position = (last_checkpoint.x,
+                               last_checkpoint.y+5, last_checkpoint.z)
+            health_bar_1.value = 100
+            deathSound = Audio('./assets/sounds/death.ogg',
+                               autoplay=True)
+            deathSound.volume = playerSoundsVolume
+            jump = False
+
+        if clé_jump.hovered and distance(player, clé_jump) <= 9:
+            clé_jump.color = color.orange
+        else:
+            clé_jump.color = color.yellow
+
     if jump == False:
         lave_jump.position = (3000, 980, 3000)
 
-    if clé_jump.hovered and distance(player, clé_jump) <= 9:
-        clé_jump.color = color.orange
-    else:
-        clé_jump.color = color.yellow
     if clé_lab.hovered and distance(player, clé_lab) <= 9:
         clé_lab.color = color.orange
     else:
@@ -1556,41 +1603,12 @@ sol_labyrinthe = Entity(model='plane',                     # car défaut de mod�
                         color=color.rgba(0, 0, 0, 5),
                         texture_scale=(5, 5))
 
-
-clé_lab = Entity(model='./assets/models/clé.obj',
-                 position=(2057.5, 1001, 1941),
-                 color=color.yellow,
-                 scale=(2, 2, 2),
-                 collider='mesh',
-                 rotation_x=90)
-
-jump = Entity(model='./assets/models/jump22.obj',
-              position=(3000, 1000, 3000),
-              texture='brick',
-              scale=(1, 1, 1),
-              collider='mesh',
-              texture_scale=(15, 15),
-              double_sided=True,
-              use_cache=False)
-""" 
-fin_jump = Entity(model='cube',
-                  position=(2985.72, 1033, 3035.53),
-                  scale=(7, 1, 7),
-                  collider='mesh',
-                  texture_scale=(15, 15),
-                  texture='brick') """
-clé_jump = Entity(model='./assets/models/clé.obj',
-                  position=Vec3(3011.3547, 1036.232, 3035.4333),
-                  scale=(1, 1, 1),
-                  color=color.yellow,
-                  rotation_x=90,
-                  rotation_y=90)
-lave_jump = Entity(model='plane',
-                   position=(3000, 980, 3000),
-                   texture='./assets/textures/lave.png',
-                   scale=(1000, 1000, 1000),
-                   texture_scale=(500, 500),
-                   collider='box')
+clé_lab = DroppedItem(modelEnt="./assets/models/clé.obj",
+                      pos=(2057.5, 1001, 1941),
+                      scaleEnt=0.5,
+                      colorEnt=color.yellow,
+                      modelName="clé",
+                      )
 
 """ grille_portail5 = Entity(model='./assets/models/grille.obj',
                          color=color.gray,

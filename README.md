@@ -69,8 +69,15 @@ python game.py --config configFile.json --multiplayer host/client --ipaddress ws
 ```json
 {
     "user": {
-        "sensi": 45,
-        "renderDistance": 40
+        "camera": {
+            "sensi": 45,
+            "renderDistance": 45
+        },
+        "sounds": {
+            "musics": 0.1,
+            "ambientSounds": 1,
+            "playerSounds": 0.5
+        }
     }
 }
 ```
