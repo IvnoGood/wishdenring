@@ -1387,7 +1387,7 @@ def update():
             pause_menu = False
 
     for i in tp_grotte:
-        if distance(player.position, tp_grotte[i]["portal"].position) <= 4.5:
+        if distance(player.position, tp_grotte[i]["portal"].position) <= 4:
             portailTpSound = Audio('./assets/sounds/teleport.ogg',
                                    autoplay=True)
             portailTpSound.volume = ambientSoundsVolume
