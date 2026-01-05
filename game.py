@@ -165,6 +165,7 @@ class Enemies(Entity):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
         super().__init__(position=Vec3(*position), **kwargs)
+        collider = 'box',
         # Create children using local coordinates and parent=self so moving this Entity moves them all
         self.sphere = Entity(
             parent=self,
@@ -172,7 +173,7 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 0, 0),
             scale=1,
-            collider='box'
+            
         )
 
         self.torso = Entity(
@@ -181,7 +182,7 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 1.25, 0),
             scale=Vec3(1, 2, 1),
-            collider='box'
+           
 
         )
 
@@ -191,7 +192,7 @@ class Enemies(Entity):
             texture='shrek_face.jpg',
             position=Vec3(0, 2.75, 0),
             scale=Vec3(1, 1, 1),
-            collider='box',
+           
             double_sided=True
         )
 
@@ -1393,7 +1394,7 @@ def update():
             pause_menu = False
 
     for i in tp_grotte:
-        if distance(player.position, tp_grotte[i]["portal"].position) <= 3:
+        if distance(player.position, tp_grotte[i]["portal"].position) <= 4.5:
             portailTpSound = Audio('./assets/sounds/teleport.ogg',
                                    autoplay=True)
             portailTpSound.volume = ambientSoundsVolume
