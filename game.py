@@ -1282,7 +1282,7 @@ def update():
     portail6.rotation = Vec3(0, 236.51391, 0)
     if distance(player, portail6) < 4:
         portalsEntity["lab"]["labyrinthe"] = Entity(model='./assets/models/labyrinthe.obj',
-                    position=(2000, 1000, 2000),
+                    position=(2000, 999, 2000),
                     scale=(100, 100, 100),
                     texture='./assets/textures/stone/stonebricks0001.png',
                     collider='mesh',
@@ -1290,7 +1290,7 @@ def update():
                     double_sided=True)
 
         portalsEntity["lab"]["sol_labyrinthe"] = Entity(model='plane',                     # car défaut de modèle
-                                position=(2050, 999.9, 1940),
+                                position=(2050, 999.05, 1940),
                                 scale=(2000, 30, 2000),
                                 texture='brick',
                                 collider='box',
@@ -1416,7 +1416,7 @@ def update():
             pause_menu = False
 
     for i in tp_grotte:
-        if distance(player.position, tp_grotte[i]["portal"].position) <= 4.5:
+        if distance(player.position, tp_grotte[i]["portal"].position) <= 4:
             portailTpSound = Audio('./assets/sounds/teleport.ogg',
                                    autoplay=True)
             portailTpSound.volume = ambientSoundsVolume
