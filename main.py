@@ -12,7 +12,7 @@ import sys
 import os
 import json
 import time
-from pypresence import Presence
+from pypresence import *
 import asyncio
 
 
@@ -388,20 +388,24 @@ def setup_demo(master):
 
 
 if __name__ == '__main__':
-    client_id = "1433129828181082223"
-    RPC = Presence(client_id=client_id)
-    RPC.connect()
-    RPC.update(
-        state="Joue a WishDenRing",
-        details="Est actuellement dans le luncher",
-        large_image=(
-            "eldenwish"
-        ),
-        large_text="Killing !",
-        small_image=(
-            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk4aTU0cXBlaW5lNzIxcDl5NmlnenAzZXl0emRrejkwZWMwbnoxaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dyI6cxt3iM154xESjP/giphy.gif"),
-        small_text="WAAAZAAA !",
-    )
+    try :
+        client_id = "1433129828181082223"
+        RPC = Presence(client_id=client_id)
+        if (RPC):
+            RPC.connect()
+            RPC.update(
+                state="Joue a WishDenRing",
+                details="Est actuellement dans le luncher",
+                large_image=(
+                    "eldenwish"
+                ),
+                large_text="Killing !",
+                small_image=(
+                    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk4aTU0cXBlaW5lNzIxcDl5NmlnenAzZXl0emRrejkwZWMwbnoxaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dyI6cxt3iM154xESjP/giphy.gif"),
+                small_text="WAAAZAAA !",
+            )
+    except exceptions.DiscordNotFound:
+        print("Discord instance not found, AssertionError normal but no influence")
 
     app = ttk.Window("WishDenRing Luncher",
                      iconphoto="./assets/icons/eldenwish.png")

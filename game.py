@@ -209,7 +209,7 @@ barre_de_vie_enemy = Entity(parent=enemy,
 
 # log les info dans l'inventaire
 inventaire = {
-    0: {"model": "katana", "color": color.magenta},
+    0: {"model": "katana", "color": color.brown},
     1: {},
     2: {},
     3: {},
@@ -908,13 +908,6 @@ erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      colorEnt=color.red,
                      modelName="fiole") """
 
-erlenR = DroppedItem(modelEnt="./assets/models/clé.obj",
-                     pos=(5, 0, 2),
-                     scaleEnt=0.5,
-                     colorEnt=color.yellow,
-                     modelName="clé",
-                     coinValue=20)
-
 boss_dmg = 25
 boss_win = False
 tp_grotte_boss = Entity(model='cube',
@@ -986,6 +979,13 @@ environementSounds.volume = musicSoundsVolume
 print("Loaded:", environementSounds)
 # ------ END AUDIO environement ------
 
+jump = False
+portalsEntity = {"jump": {}}
+
+isLunch = True
+isTuto = False
+isCheatsAct = False
+
 
 def update():
     global vitesse_chute, speedFact
@@ -1012,11 +1012,43 @@ def update():
     global lave_jump
     global pv_enemy_boss, boss_win, health_bar_1
     global death, dash_cooldown, boss_attacking, boss_timer, boss_dmg
+    global portalsEntity, portalsEntity
+    global isLunch, isTuto
+    global isCheatsAct
 
-    if (held_keys["l"]):
-        print(player.position)
-        print([portail.rotation, portail2.rotation, portail3.rotation,
-              portail4.rotation, portail6.rotation])
+    if (held_keys["m"]):
+        isCheatsAct = not isCheatsAct
+        print(f"Cheats Toggled, current state: {isCheatsAct}")
+        time.sleep(0.125)
+
+    if(held_keys["j"] and isCheatsAct):
+        print("Teleported to the jump win location")
+        player.position = Vec3(3012.7204, 1035.232, 3035.33)
+        time.sleep(0.125)
+    
+    if(held_keys["o"] and isCheatsAct):
+        print("Spawned amethyst sword !")
+        cheat_item = DroppedItem(modelEnt="./assets/models/katana.obj",
+                               pos=(player.x+5, player.y+1, player.z),
+                               scaleEnt=0.5,
+                               colorEnt=color.magenta,
+                               modelName="katana"
+                               )
+
+    if (held_keys["l"] and isCheatsAct):
+        print("Current world position: ",player.position)
+    
+    if isLunch:
+        TutoDm = Text(text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)",origin=(0, -1.4))
+        if (held_keys["y"]):
+            print("yes")
+            isTuto = not isTuto
+            isLunch = not isLunch
+            TutoDm.disable()
+        if(held_keys["n"]):
+            print("no")
+            isLunch = not isLunch
+            TutoDm.disable()
 
     if held_keys['q'] and time.time()-dash_cooldown >= 1.5 and pause == False:
         print('dash')
@@ -1183,12 +1215,10 @@ def update():
     # PRIS PR LE BOSS DE VIK
 
     portail4.rotation = Vec3(0, 146.95483, 0)
-    jump = None
-    clé_jump = None
-    lave_jump = None
+
     if distance(player, portail4) < 4:
 
-        jumpModel = Entity(model='./assets/models/jump22.obj',
+        portalsEntity["jump"]["jump"] = Entity(model='./assets/models/jump22.obj',
                            position=(3000, 1000, 3000),
                            texture='brick',
                            scale=(1, 1, 1),
@@ -1197,14 +1227,14 @@ def update():
                            double_sided=True,
                            use_cache=False)
 
-        clé_jump = DroppedItem(modelEnt="./assets/models/clé.obj",
-                               pos=Vec3(3011.3547, 1036.232, 3035.4333),
+        portalsEntity["jump"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
+                               pos=Vec3(3011.3547, 1034.232, 3035.4333),
                                scaleEnt=0.5,
                                colorEnt=color.blue,
                                modelName="clé"
                                )
 
-        lave_jump = Entity(model='plane',
+        portalsEntity["jump"]["lave_jump"] = Entity(model='plane',
                            position=(3000, 980, 3000),
                            texture='./assets/textures/lave.png',
                            scale=(1000, 1000, 1000),
@@ -1214,7 +1244,7 @@ def update():
         player.position = (3000, 1001.5, 3001.7)
         portailTpSound.play()
         jump = True
-        if player.intersects(lave_jump):
+        if player.intersects(portalsEntity["jump"]["lave_jump"]):
             player.position = (last_checkpoint.x,
                                last_checkpoint.y+5, last_checkpoint.z)
             jump = False
@@ -1232,17 +1262,26 @@ def update():
     if distance(player, portaillab) < 4:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
+        
 
     portailjump.look_at(player)
     portailjump.rotation_y = portailjump.rotation_y + 180
     portailjump.rotation_x = 0
     portailjump.rotation_z = 0
-    if player.intersects(portailjump):
+
+    if distance(player, portailjump) < 4:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
+        print("win detect")
+        destroy(portalsEntity["jump"]["lave_jump"])
+        destroy(portalsEntity["jump"]["jump"])
+        destroy(portalsEntity["jump"]["clé_lab"])
+        portalsEntity["jump"] = {}
         jump = False
 
     if jump == True:
+        lave_jump = portalsEntity["jump"]["lave_jump"]
+        clé_jump = portalsEntity["jump"]["clé_lab"]
         lave_jump.y += 0.25 * time.dt
         if player.intersects(lave_jump):
             player.position = (last_checkpoint.x,
@@ -1257,9 +1296,6 @@ def update():
             clé_jump.color = color.orange
         else:
             clé_jump.color = color.yellow
-
-    if jump == False:
-        lave_jump.position = (3000, 980, 3000)
 
     if clé_lab.hovered and distance(player, clé_lab) <= 9:
         clé_lab.color = color.orange
@@ -1404,14 +1440,14 @@ def input(key):
     global clé_labe
     if key == 'left mouse down':
         print("Point 3D sous la souris :", mouse.world_point)
-    if key == 'left mouse down' and clé_lab.hovered and distance(player, clé_lab) <= 9:
+    """ if key == 'left mouse down' and clé_lab.hovered and distance(player, clé_lab) <= 9:
         clé_lab.visible = False
         clé_lab.collider = None
         clé_labe = True
     if key == 'left mouse down' and clé_jump.hovered and distance(player, clé_jump) <= 9:
         clé_jump.visible = False
         clé_jump.collider = None
-        clé_jumpe = True
+        clé_jumpe = True """
 
 
 portail = SpriteSheetAnimation(    # portail du lobby
@@ -1566,7 +1602,7 @@ portailjump = SpriteSheetAnimation(   # portail du labyrinthe
     fps=8,
     animations={'pouet3': ((0, 0), (2, 1))})
 portailjump.play_animation('pouet3')
-portailjump.position = Vec3(3012.7204, 1040.232, 3035.33)
+portailjump.position = Vec3(3012.7204, 1037.232, 3035.33)
 portailjump.scale = (5, 5)
 portailjump.color = color.orange
 
