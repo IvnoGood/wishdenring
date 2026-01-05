@@ -988,6 +988,7 @@ isLunch = True
 isTuto = False
 isCheatsAct = False
 
+TutoDm = Text(text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)",origin=(0, -1.4))
 
 def update():
     global vitesse_chute, speedFact
@@ -1041,7 +1042,6 @@ def update():
         print("Current world position: ",player.position)
     
     if isLunch:
-        TutoDm = Text(text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)",origin=(0, -1.4))
         if (held_keys["y"]):
             print("yes")
             isTuto = not isTuto
