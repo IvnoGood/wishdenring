@@ -991,6 +991,21 @@ isCheatsAct = False
 
 TutoDm = Text(text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)",origin=(0, -1.4))
 
+descr = dedent('''
+      Pour changer les items ds votre mains utilisez les touches [1;9]. 
+      Pour acheter des armes utilisez les PNJ leurs fonction est marqué en dessous.
+      L'argent est gagné en tuant le boss shrek tuer le plus de fois pour récolter plus d'argent.
+      La fontaine permet de vous soigner après chaque combat.
+      Pour boire c'est click droit, frapper click gauche et esquiver A.
+      Le but est de collectionner les clefs de tous les niveaux a vous de tous les réussir.
+      Pour les faires aller ds le portail vert et suivez les instructions.
+      Appuyez sur h pour fermer
+      ''').strip()
+
+TutoInv = Text(text=descr,origin=(0, -1.4))
+
+TutoInv.disable()
+
 def update():
     global vitesse_chute, speedFact
     global last_checkpoint
@@ -1053,10 +1068,17 @@ def update():
             isTuto = not isTuto
             isLunch = not isLunch
             TutoDm.disable()
+            TutoInv.enable()
         if(held_keys["n"]):
             print("no")
             isLunch = not isLunch
             TutoDm.disable()
+
+    if isTuto: 
+        if (held_keys["h"]):
+            print("ferme tuto")
+            isTuto = not isTuto
+            TutoInv.disable()
 
     if held_keys['q'] and time.time()-dash_cooldown >= 1.5 and pause == False:
         print('dash')
