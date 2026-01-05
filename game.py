@@ -653,7 +653,8 @@ ThomasNpcTag = Entity(
     texture="./assets/textures/thomas_affichage.png",
     double_sided=True,
     position=Vec3(-0.61932373, 2.5, 13.616727),
-    scale=(2, 1, 1)
+    scale=(2, 1, 1),
+    texture_scale=(1, 1)
 )
 
 NpcThomasToolTip = Text("Appuie sur T pour discuter")
@@ -692,6 +693,7 @@ AlexaNpcTag = Entity(
     double_sided=True,
     position=(16, 2.5, 12),
     scale=(2, 1, 1),
+    texture_scale=(1, 1)
 )
 AlexaToolTip = Text("Appuie sur T pour discuter")
 AlexaToolTip.disable()
