@@ -425,7 +425,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
              collider='box', origin_y=0.5, texture_scale=(64, 64), double_sided=True, shader=lit_with_shadows_shader)
  """
 Entity(model='plane', scale=64,
-       shader=lit_with_shadows_shader, collider="box", texture="brick", texture_scale=(64, 64), color=color.rgba(0.8, 0.8, 0.8, 1))
+       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/bricks.png", texture_scale=(64, 64))
 
 # ------ END TERRAIN ------
 
@@ -983,7 +983,7 @@ print("Loaded:", environementSounds)
 # ------ END AUDIO environement ------
 
 jump = False
-portalsEntity = {"jump": {}}
+portalsEntity = {"jump": {}, "lab":{}}
 
 isLunch = True
 isTuto = False
@@ -1028,6 +1028,11 @@ def update():
     if(held_keys["j"] and isCheatsAct):
         print("Teleported to the jump win location")
         player.position = Vec3(3008.9265, 1035.2573, 3035.5764)
+        time.sleep(0.125)
+
+    if(held_keys["i"] and isCheatsAct):
+        print("Teleported to the lab win location")
+        player.position =  Vec3(2057.5, 1045, 1941)
         time.sleep(0.125)
     
     if(held_keys["o"] and isCheatsAct):
@@ -1231,7 +1236,7 @@ def update():
                            use_cache=False)
 
         portalsEntity["jump"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
-                               pos=Vec3(3011.3547, 1034.232, 3035.4333),
+                               pos=Vec3(3011.3547, 1035.232, 3035.4333),
                                scaleEnt=0.5,
                                colorEnt=color.blue,
                                modelName="clé"
@@ -1254,7 +1259,7 @@ def update():
 
     portail6.rotation = Vec3(0, 236.51391, 0)
     if distance(player, portail6) < 4:
-        """ labyrinthe = Entity(model='./assets/models/labyrinthe.obj',
+        portalsEntity["lab"]["labyrinthe"] = Entity(model='./assets/models/labyrinthe.obj',
                     position=(2000, 1000, 2000),
                     scale=(100, 100, 100),
                     texture='./assets/textures/stone/stonebricks0001.png',
@@ -1262,7 +1267,7 @@ def update():
                     texture_scale=(100, 100),
                     double_sided=True)
 
-        sol_labyrinthe = Entity(model='plane',                     # car défaut de modèle
+        portalsEntity["lab"]["sol_labyrinthe"] = Entity(model='plane',                     # car défaut de modèle
                                 position=(2050, 999.9, 1940),
                                 scale=(2000, 30, 2000),
                                 texture='brick',
@@ -1270,12 +1275,12 @@ def update():
                                 color=color.rgba(0, 0, 0, 5),
                                 texture_scale=(5, 5))
 
-        clé_lab = DroppedItem(modelEnt="./assets/models/clé.obj",
+        portalsEntity["lab"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
                             pos=(2057.5, 1001, 1941),
                             scaleEnt=0.5,
                             colorEnt=color.yellow,
                             modelName="clé",
-                            ) """
+                            )
 
         portailTpSound.play()
         player.position = Vec3(1957.1273, 1005, 2092.245)
@@ -1285,8 +1290,11 @@ def update():
     portaillab.rotation_y = portaillab.rotation_y + 180
     portaillab.rotation_x = 0
     portaillab.rotation_z = 0
-    if distance(player, portaillab) < 4:
+    if distance(player, portaillab) < 3:
         player.position = (1000, 986, 1000)
+        destroy(portalsEntity["lab"]["labyrinthe"])
+        destroy(portalsEntity["lab"]["sol_labyrinthe"])
+        destroy(portalsEntity["lab"]["clé_lab"])
         portailTpSound.play()
         
 
@@ -1295,7 +1303,7 @@ def update():
     portailjump.rotation_x = 0
     portailjump.rotation_z = 0
 
-    if distance(player, portailjump) < 4:
+    if distance(player, portailjump) < 2.5:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
         print("win detect")
@@ -1308,7 +1316,6 @@ def update():
     if jump == True:
         lave_jump = portalsEntity["jump"]["lave_jump"]
         clé_jump = portalsEntity["jump"]["clé_lab"]
-        clé_lab = portalsEntity["lab"]["clé_jump"]
         lave_jump.y += 0.25 * time.dt
         if player.intersects(lave_jump):
             player.position = (last_checkpoint.x,
