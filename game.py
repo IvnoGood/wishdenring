@@ -1025,7 +1025,7 @@ def update():
 
     if(held_keys["j"] and isCheatsAct):
         print("Teleported to the jump win location")
-        player.position = Vec3(3012.7204, 1035.232, 3035.33)
+        player.position = Vec3(3008.9265, 1035.2573, 3035.5764)
         time.sleep(0.125)
     
     if(held_keys["o"] and isCheatsAct):
@@ -1253,6 +1253,29 @@ def update():
 
     portail6.rotation = Vec3(0, 236.51391, 0)
     if distance(player, portail6) < 4:
+        """ labyrinthe = Entity(model='./assets/models/labyrinthe.obj',
+                    position=(2000, 1000, 2000),
+                    scale=(100, 100, 100),
+                    texture='./assets/textures/stone/stonebricks0001.png',
+                    collider='mesh',
+                    texture_scale=(100, 100),
+                    double_sided=True)
+
+        sol_labyrinthe = Entity(model='plane',                     # car défaut de modèle
+                                position=(2050, 999.9, 1940),
+                                scale=(2000, 30, 2000),
+                                texture='brick',
+                                collider='box',
+                                color=color.rgba(0, 0, 0, 5),
+                                texture_scale=(5, 5))
+
+        clé_lab = DroppedItem(modelEnt="./assets/models/clé.obj",
+                            pos=(2057.5, 1001, 1941),
+                            scaleEnt=0.5,
+                            colorEnt=color.yellow,
+                            modelName="clé",
+                            ) """
+
         portailTpSound.play()
         player.position = Vec3(1957.1273, 1005, 2092.245)
         # player.position = (2057.5, 1045, 1941) WIN IS HERE
@@ -1284,6 +1307,7 @@ def update():
     if jump == True:
         lave_jump = portalsEntity["jump"]["lave_jump"]
         clé_jump = portalsEntity["jump"]["clé_lab"]
+        clé_lab = portalsEntity["lab"]["clé_jump"]
         lave_jump.y += 0.25 * time.dt
         if player.intersects(lave_jump):
             player.position = (last_checkpoint.x,
@@ -1293,16 +1317,6 @@ def update():
                                autoplay=True)
             deathSound.volume = playerSoundsVolume
             jump = False
-
-        if clé_jump.hovered and distance(player, clé_jump) <= 9:
-            clé_jump.color = color.orange
-        else:
-            clé_jump.color = color.yellow
-
-    if clé_lab.hovered and distance(player, clé_lab) <= 9:
-        clé_lab.color = color.orange
-    else:
-        clé_lab.color = color.yellow
 
     """ grille_portail5.look_at(player)
     grille_portail5.rotation_y += 90
@@ -1624,30 +1638,6 @@ sol_dome = Entity(position=(1000, 984.8989, 1000),
                   color=color.rgba(0, 0, 0, 0),
                   texture_scale=(10, 10),
                   collider='box')
-
-labyrinthe = Entity(model='./assets/models/labyrinthe.obj',
-                    position=(2000, 1000, 2000),
-                    scale=(100, 100, 100),
-                    texture='./assets/textures/stone/stonebricks0001.png',
-                    collider='mesh',
-                    texture_scale=(100, 100),
-                    double_sided=True)
-
-sol_labyrinthe = Entity(model='plane',                     # car défaut de modèle
-                        position=(2050, 999.9, 1940),
-                        scale=(2000, 30, 2000),
-                        texture='brick',
-                        collider='box',
-                        color=color.rgba(0, 0, 0, 5),
-                        texture_scale=(5, 5))
-
-clé_lab = DroppedItem(modelEnt="./assets/models/clé.obj",
-                      pos=(2057.5, 1001, 1941),
-                      scaleEnt=0.5,
-                      colorEnt=color.yellow,
-                      modelName="clé",
-                      )
-
 """ grille_portail5 = Entity(model='./assets/models/grille.obj',
                          color=color.gray,
                          position=(995.8, 986, 986),
