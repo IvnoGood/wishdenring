@@ -122,7 +122,7 @@ class Players(Entity):
     def __init__(self, position=(0, 10, 0), rotation=(0, 0, 0), model="katana", colors=color.brown, **kwargs):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
-        super().__init__(position=Vec3(*position), ** kwargs)
+        super().__init__(position=Vec3(*position), rotation=Vec3(*position), ** kwargs)
 
         # Create children using local coordinates and parent=self so moving this Entity moves them all
         self.sphere = Entity(
@@ -368,6 +368,7 @@ class HandItem(Entity):
                 time.sleep(0.125)
 
     def swing(self):
+        # on c aidé de L'IA pour cette partie pour se renseigner sur comment le faire
         global start_epee
         if time.time() - start_epee >= 1 and pause == False:
             start_epee = time.time()
@@ -873,11 +874,14 @@ for i in range(9):
 def moveClouds():
     for cloud in clouds:
         cloud.x += 1 * time.dt
+        if (cloud.x >= 150):
+            cloud.x = -100
 
 # ------ CLOUDS END ------
 
 
 moneyDp = MoneyDisplay(value=str(coins))
+droppedEntity = {}
 
 
 class DroppedItem(Entity):
@@ -894,6 +898,7 @@ class DroppedItem(Entity):
             double_sided=True,
             shader=lit_with_shadows_shader
         )
+        self.identifier = uuid.uuid4()
         self.modelName = modelName
         self.picked_up = False
         self.coin_value = coinValue
@@ -938,6 +943,11 @@ erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
                      scaleEnt=0.25,
                      colorEnt=color.red,
                      modelName="fiole") """
+erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
+                     pos=(6, 0.5, 7),
+                     scaleEnt=0.25,
+                     colorEnt=color.red,
+                     modelName="fiole")
 
 boss_dmg = 25
 boss_win = False
@@ -1332,7 +1342,7 @@ def update():
 
             portalsEntity["lab"]["sol_labyrinthe"] = Entity(model='plane',                     # car défaut de modèle
                                                             position=(
-                                                                2050, 999.05, 1940),
+                                                                2050, 998.5, 1940),
                                                             scale=(
                                                                 2000, 30, 2000),
                                                             texture='brick',
