@@ -1,0 +1,35 @@
+{
+    "connected_users": [
+        "210dd80d-264a-4de0-a7b9-f87a0f43cdaf"
+    ],
+    "playersData": [
+        {
+            "210dd80d-264a-4de0-a7b9-f87a0f43cdaf": {
+                "data": {
+                    "identifier": "210dd80d-264a-4de0-a7b9-f87a0f43cdaf"
+                },
+                "player": {
+                    "handItem": {
+                        "katana": "katana",
+                        "color": [
+                            0.6470588445663452,
+                            0.16470588743686676,
+                            0.16470588743686676,
+                            1
+                        ]
+                    },
+                    "location": [
+                        10,
+                        7.605854034423828,
+                        0
+                    ],
+                    "rotation": [
+                        0,
+                        7.605854034423828,
+                        0
+                    ]
+                }
+            }
+        }
+    ]
+}

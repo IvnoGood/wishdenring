@@ -119,7 +119,7 @@ class Character(Entity):
 
 
 class Players(Entity):
-    def __init__(self, position=(0, 10, 0), rotation=(0, 0, 0), model="katana", **kwargs):
+    def __init__(self, position=(0, 10, 0), rotation=(0, 0, 0), model="katana", colors=color.brown, **kwargs):
         # Initialize the parent entity at the networked position/rotation
         # gpt pr cette ligne utilisat de vecteurs pour faire le multijoueur
         super().__init__(position=Vec3(*position), ** kwargs)
@@ -151,13 +151,33 @@ class Players(Entity):
             scale=Vec3(1, 1, 1),
             collider='box',
         )
+        # solu d'opti donné par gpt car ct trop lent
+        self.models = {
+            "katana": load_model("./assets/models/katana.obj"),
+            "fiole": load_model("./assets/models/fiole.obj"),
+            "clé": load_model("./assets/models/clé.obj"),
+        }
 
         self.item = Entity(parent=self,
                            position=(1, 2.25, -0.5),
                            model=f"./assets/models/{model}.obj",
+                           color=colors,
                            scale=0.5,
                            rotation=(0, 90, 0)
                            )
+
+    def updItem(self, newVal):
+        print(newVal)
+        if newVal is None:
+            self.item.model = None
+        else:
+            model_name = newVal["model"]
+            self.item.color = Color(newVal["color"][0], newVal["color"]
+                                    [1], newVal["color"][2], newVal["color"][3])
+            if model_name in self.models:
+                self.item.model = self.models[model_name]
+            else:
+                self.item.model = None
 
 
 class Enemies(Entity):
@@ -173,7 +193,7 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 0, 0),
             scale=1,
-            
+
         )
 
         self.torso = Entity(
@@ -182,7 +202,7 @@ class Enemies(Entity):
             color=color.blue,
             position=Vec3(0, 1.25, 0),
             scale=Vec3(1, 2, 1),
-           
+
 
         )
 
@@ -192,7 +212,6 @@ class Enemies(Entity):
             texture='shrek_face.jpg',
             position=Vec3(0, 2.75, 0),
             scale=Vec3(1, 1, 1),
-           
             double_sided=True
         )
 
@@ -374,6 +393,9 @@ class HandItem(Entity):
         self.swinging = False
         print('not swinging')
 
+    def getItem():
+        return inventaire[slot_actuel]
+
 
 handItem = HandItem(id="fiole", entColor=color.yellow)
 
@@ -425,7 +447,7 @@ platforme = Entity(model='cube', color=color.orange, scale=(
              collider='box', origin_y=0.5, texture_scale=(64, 64), double_sided=True, shader=lit_with_shadows_shader)
  """
 Entity(model='plane', scale=64,
-       shader=lit_with_shadows_shader, collider="box", texture="./assets/textures/bricks.png", texture_scale=(64, 64))
+       shader=lit_with_shadows_shader, collider="box", texture_scale=(64, 64))
 
 # ------ END TERRAIN ------
 
@@ -447,12 +469,13 @@ bgmusicIsPlaying = False
 
 random_uuid = uuid.uuid4()
 uri = "ws://localhost:8080"
-user_data = {
+user_data = {  # contient les données envoyés au serveur qui seront modifiés juste avant l'envoi
     str(random_uuid): {
         "data": {
             "identifier": str(random_uuid)
         },
         "player": {
+            "handItem": HandItem.getItem(),
             "location": (0, 0, 0),
             "rotation": (0, 0, 0)
         }
@@ -461,9 +484,10 @@ user_data = {
 
 other_users = []
 connected_users = []
+# stocke les entitées de chaque joueur connecté sous forme {id: Entity}
 connected_user_entities = {}
-counter = 0
-PlayersMoving = {}
+counter = 0  # valeur pr l'upd des envois de données
+PlayersMoving = {}  # stocke chque joueuren mvt pr les anims de mvt
 
 if args.ipaddr:
     uri = args.ipaddr
@@ -506,6 +530,9 @@ def placeOtherPlayers():
             connectedPlayer = connected_user_entities[val]
             loc = client[val]["player"]["location"]
             rot = client[val]["player"]["rotation"]
+            itemDic = client[val]["player"]["handItem"]
+
+            connectedPlayer.updItem(itemDic)
 
             if not PlayersMoving.get(val, False):
                 PlayersMoving[val] = True
@@ -522,9 +549,10 @@ def placeOtherPlayers():
             if (val != str(random_uuid)):
                 loc = client[val]["player"]["location"]
                 rot = client[val]["player"]["rotation"]
-                newPlayer = Players(position=loc, rotation=rot)
+                itemDic = client[val]["player"]["handItem"]
+                newPlayer = Players(
+                    position=loc, rotation=rot, model=itemDic["model"], colors=itemDic["color"])
                 connected_user_entities[val] = newPlayer
-                print(connected_user_entities)
             pass
 
 # ------ MULTIPLAYER END ------
@@ -983,13 +1011,15 @@ print("Loaded:", environementSounds)
 # ------ END AUDIO environement ------
 
 jump = False
-portalsEntity = {"jump": {}, "lab":{}}
+portalsEntity = {"jump": {}, "lab": {}}
 
 isLunch = True
 isTuto = False
 isCheatsAct = False
+isPortalRoom = False
 
-TutoDm = Text(text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)",origin=(0, -1.4))
+TutoDm = Text(
+    text="Veut tu un tuto pour jouer a notre jeu ? (Y/N)", origin=(0, -1.4))
 
 descr = dedent('''
       Pour changer les items ds votre mains utilisez les touches [1;9]. 
@@ -1002,9 +1032,10 @@ descr = dedent('''
       Appuyez sur h pour fermer
       ''').strip()
 
-TutoInv = Text(text=descr,origin=(0, -1.4))
+TutoInv = Text(text=descr, origin=(0, -1.4))
 
 TutoInv.disable()
+
 
 def update():
     global vitesse_chute, speedFact
@@ -1034,34 +1065,35 @@ def update():
     global portalsEntity, portalsEntity
     global isLunch, isTuto
     global isCheatsAct
+    global isPortalRoom
 
     if (held_keys["m"]):
         isCheatsAct = not isCheatsAct
         print(f"Cheats Toggled, current state: {isCheatsAct}")
         time.sleep(0.125)
 
-    if(held_keys["j"] and isCheatsAct):
+    if (held_keys["j"] and isCheatsAct):
         print("Teleported to the jump win location")
         player.position = Vec3(3008.9265, 1035.2573, 3035.5764)
         time.sleep(0.125)
 
-    if(held_keys["i"] and isCheatsAct):
+    if (held_keys["i"] and isCheatsAct):
         print("Teleported to the lab win location")
-        player.position =  Vec3(2057.5, 1045, 1941)
+        player.position = Vec3(2057.5, 1045, 1941)
         time.sleep(0.125)
-    
-    if(held_keys["o"] and isCheatsAct):
+
+    if (held_keys["o"] and isCheatsAct):
         print("Spawned amethyst sword !")
         cheat_item = DroppedItem(modelEnt="./assets/models/katana.obj",
-                               pos=(player.x+5, player.y+1, player.z),
-                               scaleEnt=0.5,
-                               colorEnt=color.magenta,
-                               modelName="katana"
-                               )
+                                 pos=(player.x+5, player.y+1, player.z),
+                                 scaleEnt=0.5,
+                                 colorEnt=color.magenta,
+                                 modelName="katana"
+                                 )
 
     if (held_keys["l"] and isCheatsAct):
-        print("Current world position: ",player.position)
-    
+        print("Current world position: ", player.position)
+
     if isLunch:
         if (held_keys["y"]):
             print("yes")
@@ -1069,12 +1101,12 @@ def update():
             isLunch = not isLunch
             TutoDm.disable()
             TutoInv.enable()
-        if(held_keys["n"]):
+        if (held_keys["n"]):
             print("no")
             isLunch = not isLunch
             TutoDm.disable()
 
-    if isTuto: 
+    if isTuto:
         if (held_keys["h"]):
             print("ferme tuto")
             isTuto = not isTuto
@@ -1234,106 +1266,118 @@ def update():
     if distance(player, portail) < 4:
         player.position = (1000, 986, 1000)
         portailTpSound.play()
+        isPortalRoom = True
 
-    portail2.rotation = Vec3(0, 52.433784, 0)
-    if distance(player, portail2) < 4:
-        player.position = (last_checkpoint.x,
-                           last_checkpoint.y+5, last_checkpoint.z)
-        portailTpSound.play()
+    if (isPortalRoom):
 
-    portail3.rotation = Vec3(0, 96.54034, 0)
-    # PRIS PR LE BOSS DE VIK
-
-    portail4.rotation = Vec3(0, 146.95483, 0)
-
-    if distance(player, portail4) < 4:
-
-        portalsEntity["jump"]["jump"] = Entity(model='./assets/models/jump22.obj',
-                           position=(3000, 1000, 3000),
-                           texture='brick',
-                           scale=(1, 1, 1),
-                           collider='mesh',
-                           texture_scale=(15, 15),
-                           double_sided=True,
-                           use_cache=False)
-
-        portalsEntity["jump"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
-                               pos=Vec3(3011.3547, 1035.232, 3035.4333),
-                               scaleEnt=0.5,
-                               colorEnt=color.blue,
-                               modelName="clé"
-                               )
-
-        portalsEntity["jump"]["lave_jump"] = Entity(model='plane',
-                           position=(3000, 980, 3000),
-                           texture='./assets/textures/lave.png',
-                           scale=(1000, 1000, 1000),
-                           texture_scale=(500, 500),
-                           collider='box')
-
-        player.position = (3000, 1001.5, 3001.7)
-        portailTpSound.play()
-        jump = True
-        if player.intersects(portalsEntity["jump"]["lave_jump"]):
+        portail2.rotation = Vec3(0, 52.433784, 0)
+        if distance(player, portail2) < 4:
             player.position = (last_checkpoint.x,
                                last_checkpoint.y+5, last_checkpoint.z)
+            portailTpSound.play()
+
+        portail3.rotation = Vec3(0, 96.54034, 0)
+        # PRIS PR LE BOSS DE VIK
+
+        portail4.rotation = Vec3(0, 146.95483, 0)
+
+        if distance(player, portail4) < 4:
+
+            portalsEntity["jump"]["jump"] = Entity(model='./assets/models/jump22.obj',
+                                                   position=(3000, 1000, 3000),
+                                                   texture='brick',
+                                                   scale=(1, 1, 1),
+                                                   collider='mesh',
+                                                   texture_scale=(15, 15),
+                                                   double_sided=True,
+                                                   use_cache=False)
+
+            portalsEntity["jump"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
+                                                           pos=Vec3(
+                                                               3011.3547, 1035.232, 3035.4333),
+                                                           scaleEnt=0.5,
+                                                           colorEnt=color.blue,
+                                                           modelName="clé"
+                                                           )
+
+            portalsEntity["jump"]["lave_jump"] = Entity(model='plane',
+                                                        position=(
+                                                            3000, 980, 3000),
+                                                        texture='./assets/textures/lave.png',
+                                                        scale=(
+                                                            1000, 1000, 1000),
+                                                        texture_scale=(
+                                                            500, 500),
+                                                        collider='box')
+
+            player.position = (3000, 1001.5, 3001.7)
+            portailTpSound.play()
+            jump = True
+            if player.intersects(portalsEntity["jump"]["lave_jump"]):
+                player.position = (last_checkpoint.x,
+                                   last_checkpoint.y+5, last_checkpoint.z)
+                jump = False
+
+        portail6.rotation = Vec3(0, 236.51391, 0)
+        if distance(player, portail6) < 4:
+            portalsEntity["lab"]["labyrinthe"] = Entity(model='./assets/models/labyrinthe.obj',
+                                                        position=(
+                                                            2000, 999, 2000),
+                                                        scale=(100, 100, 100),
+                                                        texture='./assets/textures/stone/stonebricks0001.png',
+                                                        collider='mesh',
+                                                        texture_scale=(
+                                                            100, 100),
+                                                        double_sided=True)
+
+            portalsEntity["lab"]["sol_labyrinthe"] = Entity(model='plane',                     # car défaut de modèle
+                                                            position=(
+                                                                2050, 999.05, 1940),
+                                                            scale=(
+                                                                2000, 30, 2000),
+                                                            texture='brick',
+                                                            collider='box',
+                                                            color=color.rgba(
+                                                                0, 0, 0, 5),
+                                                            texture_scale=(5, 5))
+
+            portalsEntity["lab"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
+                                                          pos=(
+                                                              2057.5, 1001, 1941),
+                                                          scaleEnt=0.5,
+                                                          colorEnt=color.yellow,
+                                                          modelName="clé",
+                                                          )
+
+            portailTpSound.play()
+            player.position = Vec3(1957.1273, 1005, 2092.245)
+            # player.position = (2057.5, 1045, 1941) WIN IS HERE
+
+        portaillab.look_at(player)
+        portaillab.rotation_y = portaillab.rotation_y + 180
+        portaillab.rotation_x = 0
+        portaillab.rotation_z = 0
+        if distance(player, portaillab) < 3:
+            player.position = (1000, 986, 1000)
+            destroy(portalsEntity["lab"]["labyrinthe"])
+            destroy(portalsEntity["lab"]["sol_labyrinthe"])
+            destroy(portalsEntity["lab"]["clé_lab"])
+            portailTpSound.play()
+
+        portailjump.look_at(player)
+        portailjump.rotation_y = portailjump.rotation_y + 180
+        portailjump.rotation_x = 0
+        portailjump.rotation_z = 0
+
+        if distance(player, portailjump) < 2.5:
+            player.position = (1000, 986, 1000)
+            portailTpSound.play()
+            print("win detect")
+            destroy(portalsEntity["jump"]["lave_jump"])
+            destroy(portalsEntity["jump"]["jump"])
+            destroy(portalsEntity["jump"]["clé_lab"])
+            portalsEntity["jump"] = {}
             jump = False
-
-    portail6.rotation = Vec3(0, 236.51391, 0)
-    if distance(player, portail6) < 4:
-        portalsEntity["lab"]["labyrinthe"] = Entity(model='./assets/models/labyrinthe.obj',
-                    position=(2000, 999, 2000),
-                    scale=(100, 100, 100),
-                    texture='./assets/textures/stone/stonebricks0001.png',
-                    collider='mesh',
-                    texture_scale=(100, 100),
-                    double_sided=True)
-
-        portalsEntity["lab"]["sol_labyrinthe"] = Entity(model='plane',                     # car défaut de modèle
-                                position=(2050, 999.05, 1940),
-                                scale=(2000, 30, 2000),
-                                texture='brick',
-                                collider='box',
-                                color=color.rgba(0, 0, 0, 5),
-                                texture_scale=(5, 5))
-
-        portalsEntity["lab"]["clé_lab"] = DroppedItem(modelEnt="./assets/models/clé.obj",
-                            pos=(2057.5, 1001, 1941),
-                            scaleEnt=0.5,
-                            colorEnt=color.yellow,
-                            modelName="clé",
-                            )
-
-        portailTpSound.play()
-        player.position = Vec3(1957.1273, 1005, 2092.245)
-        # player.position = (2057.5, 1045, 1941) WIN IS HERE
-
-    portaillab.look_at(player)
-    portaillab.rotation_y = portaillab.rotation_y + 180
-    portaillab.rotation_x = 0
-    portaillab.rotation_z = 0
-    if distance(player, portaillab) < 3:
-        player.position = (1000, 986, 1000)
-        destroy(portalsEntity["lab"]["labyrinthe"])
-        destroy(portalsEntity["lab"]["sol_labyrinthe"])
-        destroy(portalsEntity["lab"]["clé_lab"])
-        portailTpSound.play()
-        
-
-    portailjump.look_at(player)
-    portailjump.rotation_y = portailjump.rotation_y + 180
-    portailjump.rotation_x = 0
-    portailjump.rotation_z = 0
-
-    if distance(player, portailjump) < 2.5:
-        player.position = (1000, 986, 1000)
-        portailTpSound.play()
-        print("win detect")
-        destroy(portalsEntity["jump"]["lave_jump"])
-        destroy(portalsEntity["jump"]["jump"])
-        destroy(portalsEntity["jump"]["clé_lab"])
-        portalsEntity["jump"] = {}
-        jump = False
 
     if jump == True:
         lave_jump = portalsEntity["jump"]["lave_jump"]
@@ -1394,7 +1438,22 @@ def update():
         tuple(player.position)[1],
         tuple(player.position)[2]
     ]  # TODO: la rotation en multi marche super mal tout le corps bouge alors que c pas normal
+    currentItem = HandItem.getItem()
+    print(currentItem)
 
+    if "model" in currentItem and "color" in currentItem:
+        user_data[str(random_uuid)]['player']['handItem'] = {
+            "model": currentItem["model"],
+            "color": [
+                currentItem["color"][0],
+                currentItem["color"][1],
+                currentItem["color"][2],
+                currentItem["color"][3],
+            ]
+        }
+    else:
+        user_data[str(random_uuid)]['player']['handItem'] = None
+    # print(user_data)
     if (args.multiplayer):
         if (counter == 10):
             other_users, connected_users = asyncio.run(
@@ -1564,18 +1623,6 @@ portail4Aff = Entity(
     scale=(4, 1, 2),
 )
 
-""" portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
-    texture='Dimensional_Portal.png',
-    tileset_size=(3, 2),
-    fps=8,
-    animations={'pouet3': ((0, 0), (2, 1))})
-portail5.play_animation('pouet3')
-portail5.position = (996.2, 989, 984.7)
-portail5.scale = (8, 8)
-portail._double_sided = True
-portail5.color = color.yellow
- """
-
 portail6 = SpriteSheetAnimation(   # portail labyrinthe
     texture='Dimensional_Portal.png',
     tileset_size=(3, 2),
@@ -1595,42 +1642,6 @@ portail6Aff = Entity(
     position=(987.25, 994, 991.4),
     scale=(4, 1, 2),
 )
-
-
-""" portail7 = SpriteSheetAnimation(   # portail prof de NSI
-    texture='Dimensional_Portal.png',
-    tileset_size=(3, 2),
-    fps=8,
-    animations={'pouet3': ((0, 0), (2, 1))})
-portail7.play_animation('pouet3')
-portail7.position = (984.5, 989, 1003.6)
-portail7.scale = (8, 8)
-portail._double_sided = True
-portail7.color = color.pink """
-
-
-""" portail8 = SpriteSheetAnimation(   # portail dimension vide
-    texture='Dimensional_Portal.png',
-    tileset_size=(3, 2),
-    fps=8,
-    animations={'pouet3': ((0, 0), (2, 1))})
-portail8.play_animation('pouet3')
-portail8.position = (991.87, 989, 1013)
-portail8.scale = (8, 8)
-portail._double_sided = True
-portail8.color = color.azure
- """
-
-""" portail9 = SpriteSheetAnimation(   # portail boss final
-    texture='Dimensional_Portal.png',
-    tileset_size=(3, 2),
-    fps=8,
-    animations={'pouet3': ((0, 0), (2, 1))})
-portail9.play_animation('pouet3')
-portail9.position = (1002, 989, 1015.7)
-portail9.scale = (8, 8)
-portail._double_sided = True
-portail9.color = color.red """
 
 portaillab = SpriteSheetAnimation(   # portail du labyrinthe
     texture='Dimensional_Portal.png',
@@ -1668,6 +1679,54 @@ sol_dome = Entity(position=(1000, 984.8989, 1000),
                   color=color.rgba(0, 0, 0, 0),
                   texture_scale=(10, 10),
                   collider='box')
+
+""" portail5 = SpriteSheetAnimation(   # portail horde d'ennemis
+    texture='Dimensional_Portal.png',
+    tileset_size=(3, 2),
+    fps=8,
+    animations={'pouet3': ((0, 0), (2, 1))})
+portail5.play_animation('pouet3')
+portail5.position = (996.2, 989, 984.7)
+portail5.scale = (8, 8)
+portail._double_sided = True
+portail5.color = color.yellow
+ """
+
+""" portail7 = SpriteSheetAnimation(   # portail prof de NSI
+    texture='Dimensional_Portal.png',
+    tileset_size=(3, 2),
+    fps=8,
+    animations={'pouet3': ((0, 0), (2, 1))})
+portail7.play_animation('pouet3')
+portail7.position = (984.5, 989, 1003.6)
+portail7.scale = (8, 8)
+portail._double_sided = True
+portail7.color = color.pink """
+
+
+""" portail8 = SpriteSheetAnimation(   # portail dimension vide
+    texture='Dimensional_Portal.png',
+    tileset_size=(3, 2),
+    fps=8,
+    animations={'pouet3': ((0, 0), (2, 1))})
+portail8.play_animation('pouet3')
+portail8.position = (991.87, 989, 1013)
+portail8.scale = (8, 8)
+portail._double_sided = True
+portail8.color = color.azure
+ """
+
+""" portail9 = SpriteSheetAnimation(   # portail boss final
+    texture='Dimensional_Portal.png',
+    tileset_size=(3, 2),
+    fps=8,
+    animations={'pouet3': ((0, 0), (2, 1))})
+portail9.play_animation('pouet3')
+portail9.position = (1002, 989, 1015.7)
+portail9.scale = (8, 8)
+portail._double_sided = True
+portail9.color = color.red """
+
 """ grille_portail5 = Entity(model='./assets/models/grille.obj',
                          color=color.gray,
                          position=(995.8, 986, 986),

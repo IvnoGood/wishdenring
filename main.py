@@ -92,7 +92,7 @@ def setup_demo(master):
             append_log(log_queue.get())
         app.after(50, poll_log_queue)
 
-    # sys de logs fait avec IA
+    # sys de print logs fait avec IA reste fait main
 
     # -------------------------------
     # Subprocess execution
@@ -103,6 +103,15 @@ def setup_demo(master):
         COMMAND = [sys.executable, "./game.py"]
         if (useMulti_value.get()):
             COMMAND.extend(["--multiplayer", multiType.get()])
+            if (multiType.get() == "host"):
+                files = os.listdir("server")
+                if ('node_modules' in files and "server.js" in files):
+                    subprocess.Popen('node ./server/server.js',
+                                     creationflags=subprocess.CREATE_NEW_CONSOLE)
+                else:
+                    log_queue.put(
+                        "\nLes fichiers nécéssaires au server ne sont pas accessibles veuillez lire la documentation a ce sujet\n")
+                    return
         if (useConfig_value.get()):
             COMMAND.extend(["--config", "./config.json"])
         try:
@@ -388,7 +397,7 @@ def setup_demo(master):
 
 
 if __name__ == '__main__':
-    try :
+    try:
         client_id = "1433129828181082223"
         RPC = Presence(client_id=client_id)
         if (RPC):

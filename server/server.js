@@ -3,7 +3,7 @@ const wss = new websocket.WebSocketServer({ port: 8080 });
 let connected_players = [];
 let playersData = [];
 const readline = require("node:readline/promises");
-const { stdin: input, stdout: output } = require("node:process");
+const { stdin: input, stdout: output, send } = require("node:process");
 
 console.log("WebSocket for Wishdenring has started at port: 8080 ");
 
@@ -33,12 +33,12 @@ wss.on("connection", function connection(ws) {
         console.log("New player is connecting !");
         let newArray = [...playersData, received];
         playersData = newArray;
-        ws.send(
-          JSON.stringify({
-            connected_users: connected_players,
-            playersData: playersData,
-          })
-        );
+        let sendData = JSON.stringify({
+          connected_users: connected_players,
+          playersData: playersData,
+        });
+        console.log(sendData);
+        ws.send(sendData);
       } else {
         //when need to update data
         //console.log("Has found user in array", playersData);
