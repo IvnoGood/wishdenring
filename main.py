@@ -14,6 +14,7 @@ import json
 import time
 from pypresence import *
 import asyncio
+import platform
 
 
 def setup_demo(master):
@@ -31,38 +32,6 @@ def setup_demo(master):
     )
     title.pack(side=LEFT)
     ttk.Separator(root).pack(fill=X, pady=10, padx=10)
-
-# ---
-    """     nb = ttk.Notebook(root)
-    nb.pack(
-        side=LEFT,
-        padx=(0, 0),
-        expand=YES,
-        fill=BOTH
-    ) """
-    # ----- LISTE DE BOUTONS -----
-    """     # Icons: warning, icon, error, question, info
-    grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/group.png"))
-    settIco = ImageTk.PhotoImage(Image.open("./assets/icons/settings.png"))
-    playIco = ImageTk.PhotoImage(Image.open("./assets/icons/play.png"))
-
-    play = ttk.Button(color_group, text="Jouer",
-                      image=playIco, compound=LEFT, bootstyle="dark")
-    play.image = playIco
-    play.pack(side=LEFT, expand=YES, padx=10, fill=X)
-    # ---
-
-    settings = ttk.Button(color_group, text="Paramètres",
-                          image=settIco, compound=LEFT, bootstyle="dark")
-    settings.image = settIco
-    settings.pack(side=LEFT, expand=YES, padx=10, fill=X)
-    # ---
-
-    multi = ttk.Button(color_group, text="Multijoueur (WIP)",
-                       image=grpIco, compound=LEFT, bootstyle="dark")
-    multi.image = grpIco
-    multi.pack(side=LEFT, expand=YES, padx=10, fill=X) """
-    # ----- FIN LISTE DE BOUTONS -----
 
     playFrame = ttk.Frame(root)
 
@@ -106,8 +75,12 @@ def setup_demo(master):
             if (multiType.get() == "host"):
                 files = os.listdir("server")
                 if ('node_modules' in files and "server.js" in files):
-                    subprocess.Popen('node ./server/server.js',
-                                     creationflags=subprocess.CREATE_NEW_CONSOLE)
+                    platformSys = platform.system()
+                    if platformSys == "Windows":
+                        subprocess.Popen('node ./server/server.js',
+                                        creationflags=subprocess.CREATE_NEW_CONSOLE, shell=True)
+                    elif (platformSys == "Linux"):
+                        subprocess.Popen("node ./server/server.js", shell=True)
                 else:
                     log_queue.put(
                         "\nLes fichiers nécéssaires au server ne sont pas accessibles veuillez lire la documentation a ce sujet\n")
@@ -204,7 +177,7 @@ def setup_demo(master):
     useMulti_value = tk.BooleanVar()
     useMulti = ttk.Checkbutton(
         master=configGroup,
-        text="Multijoueur (WIP)",
+        text="Multijoueur",
         bootstyle=(SUCCESS, ROUND, TOGGLE),
         variable=useMulti_value
     )
@@ -295,6 +268,9 @@ def setup_demo(master):
             jsondat = json.load(f)
             sensi.set(jsondat['user']["camera"]['sensi'])
             render.set(jsondat['user']["camera"]['renderDistance'])
+            musicSound.set(jsondat['user']["sounds"]['musics'])
+            ambientSound.set(jsondat['user']["sounds"]['ambientSounds'])
+            playerSound.set(jsondat['user']["sounds"]['playerSounds'])
 
     def browseFiles():
         filename = filedialog.askopenfilename(initialdir="./",
@@ -393,6 +369,8 @@ def setup_demo(master):
     grpIco = ImageTk.PhotoImage(Image.open("./assets/icons/volume.png"))
     grpIco.image = grpIco
     nb.add(soundsFrame, text="Audio", image=grpIco, compound=LEFT)
+
+    load("./config.json") # charge la config après tt le inits
     return root
 
 

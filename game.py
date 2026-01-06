@@ -930,25 +930,6 @@ class DroppedItem(Entity):
                         break
 
 
-"""
-coin = DroppedItem(modelEnt="./assets/models/coin.obj",
-                   pos=(4, 0.125, 4),
-                   scaleEnt=0.125,
-                   colorEnt=color.yellow,
-                   modelName="coin",
-                   coinValue=20)
-
-erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
-                     pos=(6, 0.5, 7),
-                     scaleEnt=0.25,
-                     colorEnt=color.red,
-                     modelName="fiole") """
-erlenR = DroppedItem(modelEnt="./assets/models/fiole.obj",
-                     pos=(6, 0.5, 7),
-                     scaleEnt=0.25,
-                     colorEnt=color.red,
-                     modelName="fiole")
-
 boss_dmg = 25
 boss_win = False
 tp_grotte_boss = Entity(model='cube',
@@ -986,6 +967,14 @@ def degat():
                            colorEnt=color.yellow,
                            modelName="coin",
                            coinValue=randint(50, 75))
+        """         if (args.multiplayer == "host"):
+            for i in range(1, len(connected_user_entities)):
+                coin = DroppedItem(modelEnt="./assets/models/coin.obj",
+                           pos=(location[0]+i, location[1], location[2]),
+                           scaleEnt=0.125,
+                           colorEnt=color.yellow,
+                           modelName="coin",
+                           coinValue=randint(50, 75)) """
         clé_jump = DroppedItem(modelEnt="./assets/models/clé.obj",
                                pos=location,
                                scaleEnt=0.5,
@@ -1433,12 +1422,12 @@ def update():
 
     if player.y <= -45:
         player.position = (last_checkpoint.x,
-                           last_checkpoint.y + 2, last_checkpoint.z)
+                           last_checkpoint.y + 5, last_checkpoint.z)
 
         # gravité
     if player.y <= -15:
         player.position = (last_checkpoint.x,
-                           last_checkpoint.y + 2, last_checkpoint.z)
+                           last_checkpoint.y + 5, last_checkpoint.z)
         boss_battle = False
         sky.texture = sky_path
 
